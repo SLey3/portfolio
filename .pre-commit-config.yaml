@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.32.0
+    hooks:
+      - id: eslint
+        args: [--fix, '.']
+        files: '\\.(js|.jsx|.ts|.tsx)$'
+        exclude: ^node_modules/, ^backend/
+  - repo: https://github.com/psf/black
+    rev: 23.1a1
+    hooks:
+      - id: black
+        language_version: python3
+        exclude: ^frontend/
+  - repo: https://github.com/pycqa/isort
+    rev: 5.6.4
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        language_version: python3
+        exclude: ^frontend/
+  - repo: https://github.com/pre-commit/pytest
+    rev: v3.0.0
+    hooks:
+      - id: pytest
+        language_version: python3
+        exclude: ^frontend
+  - repo: local
+    hooks:
+      - id: run-prettier
+        name: Run Prettier Formatter
+        entry: cd frontend && npx prettier
+        language: script
+        pass_filenames: false
+        files: '\\.(js|jsx|ts|tsx)$'
+        exclude: ^frontend/node_modules/, ^backend/

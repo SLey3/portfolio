@@ -1,0 +1,8 @@
+[flake8]
+exclude=__pycache__, migrations, instance
+max-line-length=110
+extend-ignore=
+    E203
+    E701
+    VNE003
+    F405
