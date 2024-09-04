@@ -38,7 +38,7 @@ repos:
     hooks:
       - id: run-prettier
         name: Run Prettier Formatter
-        entry: cd frontend && npx prettier
+        entry: cd frontend && npx prettier --write .
         language: script
         pass_filenames: false
         files: '\\.(js|jsx|ts|tsx)$'
