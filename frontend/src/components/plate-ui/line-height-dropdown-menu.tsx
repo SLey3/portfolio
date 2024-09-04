@@ -4,7 +4,6 @@ import {
 	useLineHeightDropdownMenu,
 	useLineHeightDropdownMenuState,
 } from '@udecode/plate-line-height';
-import React from 'react';
 
 import {
 	DropdownMenu,

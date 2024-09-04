@@ -1,5 +1,3 @@
-'use client';
-
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { withCn, withProps } from '@udecode/cn';
 import React from 'react';

@@ -6,7 +6,6 @@ import {
 	useEditorRef,
 	usePlateStore,
 } from '@udecode/plate-common';
-import React from 'react';
 
 import {
 	DropdownMenu,

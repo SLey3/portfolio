@@ -1,7 +1,6 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn, withRef } from '@udecode/cn';
 import { cva } from 'class-variance-authority';
-import * as React from 'react';
 
 export const Popover = PopoverPrimitive.Root;
 

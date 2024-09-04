@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@udecode/cn';
 import {
 	CommentProvider,
@@ -9,7 +7,6 @@ import {
 	useFloatingCommentsState,
 } from '@udecode/plate-comments';
 import { PortalBody } from '@udecode/plate-common';
-import React from 'react';
 
 import { CommentCreateForm } from './comment-create-form';
 import { CommentItem } from './comment-item';

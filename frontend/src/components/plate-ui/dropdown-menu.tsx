@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import {
@@ -11,7 +9,6 @@ import {
 	withVariants,
 } from '@udecode/cn';
 import { cva } from 'class-variance-authority';
-import * as React from 'react';
 import { useCallback, useState } from 'react';
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;

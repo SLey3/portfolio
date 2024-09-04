@@ -21,7 +21,6 @@ import {
 	useTableElementState,
 	useTableMergeState,
 } from '@udecode/plate-table';
-import React from 'react';
 import { useReadOnly, useSelected } from 'slate-react';
 
 import { Button } from './button';

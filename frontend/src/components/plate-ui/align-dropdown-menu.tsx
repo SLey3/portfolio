@@ -6,7 +6,6 @@ import {
 	useAlignDropdownMenu,
 	useAlignDropdownMenuState,
 } from '@udecode/plate-alignment';
-import React from 'react';
 
 import {
 	DropdownMenu,

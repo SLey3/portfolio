@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
 import { cn, withCn, withRef, withVariants } from '@udecode/cn';

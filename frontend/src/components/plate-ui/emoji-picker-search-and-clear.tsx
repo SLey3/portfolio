@@ -1,7 +1,6 @@
 import { Icons } from '@/components/icons';
 import { cn } from '@udecode/cn';
 import type { UseEmojiPickerType } from '@udecode/plate-emoji';
-import React from 'react';
 
 export type EmojiPickerSearchAndClearProps = Pick<
 	UseEmojiPickerType,

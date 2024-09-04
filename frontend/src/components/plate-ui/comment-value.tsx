@@ -1,11 +1,8 @@
-'use client';
-
 import { cn } from '@udecode/cn';
 import {
 	CommentEditActions,
 	CommentEditTextarea,
 } from '@udecode/plate-comments';
-import React from 'react';
 
 import { buttonVariants } from './button';
 import { inputVariants } from './input';

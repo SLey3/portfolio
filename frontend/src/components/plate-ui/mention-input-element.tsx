@@ -2,7 +2,7 @@ import { MENTIONABLES } from '@/utils/plate/mentionables';
 import { cn, withRef } from '@udecode/cn';
 import { PlateElement } from '@udecode/plate-common';
 import { getMentionOnSelectItem } from '@udecode/plate-mention';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import {
 	InlineCombobox,

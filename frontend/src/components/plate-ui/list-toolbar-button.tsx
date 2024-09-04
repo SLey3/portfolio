@@ -5,7 +5,6 @@ import {
 	useListToolbarButton,
 	useListToolbarButtonState,
 } from '@udecode/plate-list';
-import React from 'react';
 
 import { ToolbarButton } from './toolbar';
 

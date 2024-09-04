@@ -12,9 +12,8 @@ import {
 } from '@udecode/plate-common';
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading';
 import { toggleIndentList } from '@udecode/plate-indent-list';
-import { toggleList, unwrapList } from '@udecode/plate-list';
+import { unwrapList } from '@udecode/plate-list';
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
-import React from 'react';
 
 import {
 	DropdownMenu,

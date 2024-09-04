@@ -47,9 +47,7 @@ def _get_cf_url(api_type: str) -> str:
     """
     match api_type:
         case "image":
-            return "https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1".format(  # noqa: F523, F524
-                CF_ID
-            )
+            return f"https://api.cloudflare.com/client/v4/accounts/{CF_ID}/images/v1"
         case "image delete":
             return "https://api/cloudflare.com/client/v4/accounts/{account_id}/images/v1/{image_id}".format(  # noqa: F523, F524
                 CF_ID

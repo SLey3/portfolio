@@ -1,5 +1,5 @@
 import type { UseEmojiPickerType } from '@udecode/plate-emoji';
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type EmojiPickerSearchBarProps = {
 	children: ReactNode;

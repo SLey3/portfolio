@@ -1,7 +1,4 @@
-'use client';
-
 import { useUserById } from '@udecode/plate-comments';
-import React from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 

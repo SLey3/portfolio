@@ -10,7 +10,6 @@ import { useEditorReadOnly } from '@udecode/plate-common';
 import { MARK_BG_COLOR, MARK_COLOR } from '@udecode/plate-font';
 import { ListStyleType } from '@udecode/plate-indent-list';
 import { ELEMENT_IMAGE } from '@udecode/plate-media';
-import React from 'react';
 
 import { AlignDropdownMenu } from './align-dropdown-menu';
 import { ColorDropdownMenu } from './color-dropdown-menu';

@@ -5,7 +5,6 @@ import {
 	type ELEMENT_MEDIA_EMBED,
 	useMediaToolbarButton,
 } from '@udecode/plate-media';
-import React from 'react';
 
 import { ToolbarButton } from './toolbar';
 

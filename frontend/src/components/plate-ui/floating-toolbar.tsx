@@ -1,5 +1,3 @@
-'use client';
-
 import { cn, withRef } from '@udecode/cn';
 import {
 	PortalBody,
@@ -14,7 +12,6 @@ import {
 	useFloatingToolbar,
 	useFloatingToolbarState,
 } from '@udecode/plate-floating';
-import React from 'react';
 
 import { Toolbar } from './toolbar';
 

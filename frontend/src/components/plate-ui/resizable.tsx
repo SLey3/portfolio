@@ -1,12 +1,9 @@
-'use client';
-
 import { cn, withRef, withVariants } from '@udecode/cn';
 import {
 	Resizable as ResizablePrimitive,
 	ResizeHandle as ResizeHandlePrimitive,
 } from '@udecode/plate-resizable';
 import { cva } from 'class-variance-authority';
-import React from 'react';
 
 export const mediaResizeHandleVariants = cva(
 	cn(

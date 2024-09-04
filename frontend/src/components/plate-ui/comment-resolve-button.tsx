@@ -1,12 +1,9 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import { cn } from '@udecode/cn';
 import {
 	CommentResolveButton as CommentResolveButtonPrimitive,
 	useComment,
 } from '@udecode/plate-comments';
-import React from 'react';
 
 import { buttonVariants } from './button';
 

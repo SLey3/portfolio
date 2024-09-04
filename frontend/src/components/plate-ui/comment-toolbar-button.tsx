@@ -1,8 +1,5 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import { useCommentAddButton } from '@udecode/plate-comments';
-import React from 'react';
 
 import { ToolbarButton } from './toolbar';
 

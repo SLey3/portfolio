@@ -4,7 +4,6 @@ import type {
 	IEmojiFloatingLibrary,
 	UseEmojiPickerType,
 } from '@udecode/plate-emoji';
-import React from 'react';
 
 export type EmojiPickerNavigationProps = {
 	onClick: (id: EmojiCategoryList) => void;

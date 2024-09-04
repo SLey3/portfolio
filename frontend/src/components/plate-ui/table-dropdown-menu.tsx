@@ -15,7 +15,6 @@ import {
 	insertTableColumn,
 	insertTableRow,
 } from '@udecode/plate-table';
-import React from 'react';
 
 import {
 	DropdownMenu,

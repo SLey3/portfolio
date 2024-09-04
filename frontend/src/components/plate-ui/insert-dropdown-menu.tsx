@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';

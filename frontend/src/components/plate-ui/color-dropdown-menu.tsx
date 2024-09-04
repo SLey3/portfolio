@@ -1,11 +1,8 @@
-'use client';
-
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import {
 	useColorDropdownMenu,
 	useColorDropdownMenuState,
 } from '@udecode/plate-font';
-import React from 'react';
 
 import { DEFAULT_COLORS, DEFAULT_CUSTOM_COLORS } from './color-constants';
 import { ColorPicker } from './color-picker';

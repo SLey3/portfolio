@@ -4,7 +4,6 @@ import {
 	useLinkToolbarButton,
 	useLinkToolbarButtonState,
 } from '@udecode/plate-link';
-import React from 'react';
 
 import { ToolbarButton } from './toolbar';
 

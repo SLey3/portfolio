@@ -4,7 +4,6 @@ import {
 	useTodoListElement,
 	useTodoListElementState,
 } from '@udecode/plate-list';
-import React from 'react';
 
 import { Checkbox } from './checkbox';
 

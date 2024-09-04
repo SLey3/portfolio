@@ -1,12 +1,9 @@
-'use client';
-
 import {
 	CommentProvider,
 	useCommentById,
 	useCommentItemContentState,
 } from '@udecode/plate-comments';
 import { formatDistance } from 'date-fns';
-import React from 'react';
 
 import { CommentAvatar } from './comment-avatar';
 import { CommentMoreDropdown } from './comment-more-dropdown';

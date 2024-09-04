@@ -5,7 +5,6 @@ import {
 	useIndentListToolbarButton,
 	useIndentListToolbarButtonState,
 } from '@udecode/plate-indent-list';
-import React from 'react';
 
 import { ToolbarButton } from './toolbar';
 

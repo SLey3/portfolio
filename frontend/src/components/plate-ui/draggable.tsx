@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import { cn, withRef } from '@udecode/cn';
 import type {
@@ -13,7 +11,6 @@ import {
 	useDraggableState,
 } from '@udecode/plate-dnd';
 import { blockSelectionActions } from '@udecode/plate-selection';
-import React from 'react';
 import type { DropTargetMonitor } from 'react-dnd';
 
 import {

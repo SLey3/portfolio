@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@udecode/cn';
 import {
 	type TCommentText,
@@ -11,7 +9,6 @@ import {
 	type PlateLeafProps,
 	type Value,
 } from '@udecode/plate-common';
-import React from 'react';
 
 export function CommentLeaf({
 	className,

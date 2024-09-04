@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import { cn } from '@udecode/cn';
 import {
@@ -8,7 +6,6 @@ import {
 	useCommentEditButton,
 	useCommentEditButtonState,
 } from '@udecode/plate-comments';
-import React from 'react';
 
 import { Button } from './button';
 import {

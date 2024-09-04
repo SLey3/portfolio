@@ -1,5 +1,3 @@
-'use client';
-
 import { Icons } from '@/components/icons';
 import type { DropdownMenuItemProps } from '@radix-ui/react-dropdown-menu';
 import { cn } from '@udecode/cn';
@@ -34,7 +32,7 @@ export function ColorDropdownMenuItem({
 					isMenu: true,
 					variant: 'outline',
 				}),
-				'size-6 border border-solid border-slate-100 border-slate-200 p-0 dark:border-slate-800',
+				'size-6 border border-solid border-slate-200 p-0 dark:border-slate-800',
 				!isBrightColor && 'border-transparent text-white',
 				className
 			)}

@@ -1,5 +1,3 @@
-'use client';
-
 /* eslint-disable unicorn/prefer-export-from */
 import { Icons } from '@/components/icons';
 import { cn } from '@udecode/cn';
@@ -56,7 +54,7 @@ import 'prismjs/components/prism-tsx.js';
 import 'prismjs/components/prism-typescript.js';
 import 'prismjs/components/prism-wasm.js';
 import 'prismjs/components/prism-yaml.js';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from './button';
 import {
