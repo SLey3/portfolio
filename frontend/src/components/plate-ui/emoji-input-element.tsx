@@ -2,7 +2,7 @@ import { useDebounce } from '@/utils/hooks/use-debounce';
 import { withRef } from '@udecode/cn';
 import { PlateElement } from '@udecode/plate-common';
 import { EmojiInlineIndexSearch, insertEmoji } from '@udecode/plate-emoji';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
 	InlineCombobox,
