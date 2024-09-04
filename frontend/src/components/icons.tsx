@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority';
 import { Columns3, Edit2, LucideProps } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import React from 'react';
 import {
 	LuAlignCenter,
 	LuAlignJustify,
