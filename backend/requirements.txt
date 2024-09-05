@@ -28,3 +28,4 @@ tzdata==2024.1; python_version >= '2'
 urllib3==2.2.2; python_version >= '3.8'
 werkzeug==3.0.3; python_version >= '3.8'
 gunicorn
+psycopg2
