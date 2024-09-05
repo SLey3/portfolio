@@ -5,17 +5,19 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    manifest: true
+    manifest: true,
+    chunkSizeWarningLimit: 1000,
   },
   server: {
+    open: true,
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://127.0.0.1:5000',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, ''),
+    //   },
+    // },
   },
   plugins: [react()],
   resolve: {

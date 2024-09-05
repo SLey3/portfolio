@@ -1,0 +1,6 @@
+{
+    "rewrites": [
+      { "source" : "/api/(.*)", "destination" : "https://api.sleylanguren.com/$1"},
+      { "source": "/(.*)", "destination": "/" }
+    ]
+}
