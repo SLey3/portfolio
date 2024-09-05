@@ -4,6 +4,7 @@ import pendulum
 import sqlalchemy as sa
 from marshmallow import validate
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql.json import JSONB
 
 from app import db, ma
 
@@ -66,7 +67,7 @@ class BlogPost(db.Model):
     created_at: Mapped[str] = mapped_column(
         default=pendulum.now(local_tz).format("LL LTS zz")
     )
-    content: Mapped[dict] = mapped_column(db.JSON(), unique=True, nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
     desc: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_draft: Mapped[bool] = mapped_column(nullable=False, default=False)
 
