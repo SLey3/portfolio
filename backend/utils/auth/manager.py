@@ -3,9 +3,7 @@ import random
 import string
 from functools import wraps
 
-from flask import request
-
-manager = {}
+from flask import request, session
 
 
 def login_user(username):
@@ -21,7 +19,7 @@ def login_user(username):
     randomized_res = random.choices(choices, k=12)
 
     token = base64.urlsafe_b64encode("".join(randomized_res).encode()).decode()
-    manager["token"] = f"Bearer {token}"
+    session["token"] = f"Bearer {token}"
     return token
 
 
@@ -29,7 +27,7 @@ def logout_user():
     """
     Logs out the user by clearing the manager.
     """
-    manager.clear()
+    session.pop("token")
 
 
 def login_required(func):
@@ -45,10 +43,10 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         token = request.headers.get("Authorization")
 
-        if not token or not manager.get("token"):
+        if not token or not session.get("token"):
             return "", 403
 
-        comparator: str = manager["token"]
+        comparator: str = session["token"]
 
         if token == comparator:
             return func(*args, **kwargs)
