@@ -4,6 +4,7 @@ from flask_mail import Mail
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.pool import NullPool
 
 import config as cg
 from utils.sql import showcase_has_data, SQLAlchemyBase
@@ -14,7 +15,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 # Flask Library's
-db = SQLAlchemy(model_class=SQLAlchemyBase, disable_autonaming=True)
+db = SQLAlchemy(
+    model_class=SQLAlchemyBase,
+    disable_autonaming=True,
+    engine_options={"poolclass": NullPool},
+)
+
 ma = Marshmallow()
 migrate = Migrate()
 mail = Mail()
