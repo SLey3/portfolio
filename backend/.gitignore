@@ -1,4 +1,5 @@
 # Virtual Envirnment
+.env
 .venv/
 Pipfile
 Pipfile.lock

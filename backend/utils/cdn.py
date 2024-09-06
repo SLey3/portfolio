@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 import requests
 from dotenv import load_dotenv
 from werkzeug.datastructures import FileStorage
+from imagekitio import ImageKit
 
 __all__ = [
     "upload_image",
@@ -32,7 +33,7 @@ __all__ = [
 load_dotenv("..")
 
 API_TOKEN = os.getenv("CLOUDFLARE_TOKEN")
-CF_ID = os.getenv("CLOUDFLARE_ID")
+IMGKIT_ID = os.getenv("IMGKIT_ID")
 
 
 def _get_cf_url(api_type: str) -> str:
@@ -47,10 +48,10 @@ def _get_cf_url(api_type: str) -> str:
     """
     match api_type:
         case "image":
-            return f"https://api.cloudflare.com/client/v4/accounts/{CF_ID}/images/v1"
+            return f"https://ik.imagekit.io/{IMGKIT_ID}/"
         case "image delete":
             return "https://api/cloudflare.com/client/v4/accounts/{account_id}/images/v1/{image_id}".format(  # noqa: F523, F524
-                CF_ID
+                IMGKIT_ID
             )
 
 
