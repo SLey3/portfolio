@@ -87,11 +87,10 @@ declare global {
 
 	interface CourseAddProps extends CourseProps {}
 
-	interface InstituteAddProps extends Omit<InstituteProps, 'logo_file'> {
+	interface InstituteAddProps extends InstituteProps {
 		expected_date?: string;
 		awards?: string;
 		major?: string;
-		logo_path: File | string;
 	}
 
 	interface ProjectsAddProps extends ProjectProps {
@@ -116,10 +115,7 @@ declare global {
 
 	interface CourseEditProps extends Partial<CourseProps> {}
 
-	interface InstituteEditProps
-		extends Partial<Omit<InstituteProps, 'logo_file'>> {
-		logo_path?: File | string;
-	}
+	interface InstituteEditProps extends Partial<InstituteProps> {}
 	interface ProjectEditProps extends Partial<ProjectProps> {
 		skills?: string;
 	}

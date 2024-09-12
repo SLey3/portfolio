@@ -7,7 +7,7 @@ import { FloatingToolbarButtons } from '@/components/plate-ui/floating-toolbar-b
 import { TooltipProvider } from '@/components/plate-ui/tooltip';
 import plugins from '@/utils/plate/plugins';
 import { CommentsProvider } from '@udecode/plate-comments';
-import { Plate, Value } from '@udecode/plate-common';
+import { Plate } from '@udecode/plate-common';
 import { Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
