@@ -1,15 +1,8 @@
 import { SetFormErrors } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import {
-	Button,
-	FileInput,
-	HR,
-	Label,
-	TextInput,
-	Textarea,
-} from 'flowbite-react';
-import React from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Button, HR, Label, TextInput, Textarea } from 'flowbite-react';
+import React, { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaAward } from 'react-icons/fa';
 import { FcDiploma1 } from 'react-icons/fc';
 import { IoIosLink } from 'react-icons/io';
@@ -22,13 +15,14 @@ const EducationAddForm: React.FC<FormProps> = ({
 	visibility,
 	setVisibility,
 }) => {
+	const [logoFile, setFile] = useState<File | null>(null);
+	const [isProcessing, setIsProcessing] = useState(false);
 	const {
 		register,
 		formState: { errors },
 		handleSubmit,
 		setError,
 		reset,
-		control,
 	} = useForm<InstituteAddProps>({
 		resetOptions: {
 			keepValues: false,
@@ -38,8 +32,14 @@ const EducationAddForm: React.FC<FormProps> = ({
 	const navigate = useNavigate();
 
 	const onSubmit: SubmitHandler<InstituteAddProps> = (data) => {
+		setIsProcessing(true);
+
 		const formdata = new FormData();
 		const BearerToken = localStorage.getItem('token');
+
+		if (!logoFile) {
+			return;
+		}
 
 		if (!data.grad_date) {
 			data.grad_date = 'undefined';
@@ -49,10 +49,7 @@ const EducationAddForm: React.FC<FormProps> = ({
 			data.awards = 'N/A';
 		}
 
-		formdata.append('file', data.logo_path);
-
-		data = { ...data, logo_path: 'placeholder text' };
-
+		formdata.append('file', logoFile);
 		formdata.append('other', JSON.stringify(data));
 
 		axios
@@ -68,6 +65,7 @@ const EducationAddForm: React.FC<FormProps> = ({
 				setVisibility(false);
 
 				setTimeout(() => {
+					setIsProcessing(false);
 					return navigate(0);
 				}, 5500);
 			})
@@ -85,7 +83,15 @@ const EducationAddForm: React.FC<FormProps> = ({
 				}
 
 				SetFormErrors<InstituteAddProps>(err, setError);
+				setIsProcessing(false);
 			});
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
+			console.log(e.target.files[0]);
+			setFile(e.target.files[0]);
+		}
 	};
 
 	const handleCancel = () => {
@@ -227,14 +233,19 @@ const EducationAddForm: React.FC<FormProps> = ({
 													message:
 														'Format must be MM/YYYY!',
 												},
-												validate: (value, values) =>
-													(value !== '' &&
-														values.expected_date ===
-															'') ||
-													(value === '' &&
-														values.expected_date !==
-															'') ||
-													'Either expected or Graduation date field must be blank!',
+												validate: {
+													not_both: (value, values) =>
+														(value !== '' &&
+															values.expected_date ===
+																'') ||
+														(value === '' &&
+															values.expected_date !==
+																'') ||
+														'Either expected or Graduation date field must be blank!',
+													year_diff: (value, values) => 
+														parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
+														'Graduation Date must be at least 4 years apart!',
+												}
 											})}
 											aria-invalid={
 												errors.grad_date
@@ -459,66 +470,11 @@ const EducationAddForm: React.FC<FormProps> = ({
 											value="Institute Logo"
 										/>
 									</div>
-									<Controller
-										control={control}
-										name="logo_path"
-										render={({
-											field: {
-												value,
-												onChange,
-												...field
-											},
-										}) => {
-											return (
-												<FileInput
-													accept="image/*"
-													id="logo"
-													sizing="sm"
-													value={
-														typeof value === 'string' ? value : value?.name
-													}
-													{...field}
-													aria-invalid={
-														errors.logo_path
-															? 'true'
-															: 'false'
-													}
-													color={
-														errors.logo_path
-															? 'failure'
-															: ''
-													}
-													helperText={
-														<>
-															<p
-																className="tracking-wide font-barlow"
-																role="alert">
-																{
-																	errors
-																		.logo_path
-																		?.message
-																}
-															</p>
-														</>
-													}
-													onChange={(e) => {
-														if (
-															e.target.files &&
-															e.target.files[0]
-														) {
-															onChange(
-																e.target
-																	.files[0]
-															);
-														}
-													}}
-												/>
-											);
-										}}
-										rules={{
-											required:
-												'Institute Logo is required',
-										}}
+									<input
+										accept="image/*"
+										id="logo"
+										onChange={handleFileChange}
+										type="file"
 									/>
 								</div>
 								<div>
@@ -611,6 +567,7 @@ const EducationAddForm: React.FC<FormProps> = ({
 									<div>
 										<Button
 											gradientMonochrome="cyan"
+											isProcessing={isProcessing}
 											pill
 											size="sm"
 											type="submit">

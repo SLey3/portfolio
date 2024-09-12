@@ -1,19 +1,26 @@
 import hashlib
 import json
-import os
 import uuid
-from pathlib import Path
 from urllib.parse import quote
+from werkzeug.utils import secure_filename
 
 import pendulum
-from flask import Blueprint, current_app, jsonify, request, send_file
+from flask import Blueprint, current_app, jsonify, request
 from flask_mail import Message
 from marshmallow import ValidationError
 
 from app import db, mail
 from models import *  # noqa: F403 | I did this as all models and schemas will be used in this file
 from utils.auth import login_required, login_user, logout_user
-from utils.cdn import delete_blog_images, patch_blog_images, upload_blog_images
+from utils.cdn import (
+    delete_blog_images,
+    patch_blog_images,
+    upload_blog_images,
+    upload_image,
+    patch_image,
+    delete_image,
+    get_file_extension,
+)
 from utils.sql import (
     get_total_blog_posts,
     get_total_project_pages,
@@ -322,19 +329,6 @@ def get_institutes():
     return schema.dump(institutes)
 
 
-@api.post("/image")
-def get_image():
-    # TODO: once CDN service is up modify this to return the URL of the CDN resource
-    data = request.get_json(silent=True)
-
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-
-    fp = data["fp"]
-
-    return send_file(fp)
-
-
 @api.post("/education/institute/add")
 @login_required
 def institute_add():
@@ -350,11 +344,20 @@ def institute_add():
     data = request.form.get("other")
     img_file = request.files.get("file")
 
+    print("img name: ", img_file.filename)
+    print("img file obj: ", img_file)
+
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
     try:
-        serialized_data = schema.loads(data)
+        serialized_data = schema.loads(
+            data,
+            partial=(
+                "logo_id",
+                "logo_url",
+            ),
+        )
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 403
 
@@ -387,13 +390,12 @@ def institute_add():
         serialized_data.pop("major")
 
     # create image file
-    img_name = "image_" + uuid.uuid4().hex + ".png"
+    file_ext = get_file_extension(img_file.mimetype)
+    img_name = secure_filename(f"image_{uuid.uuid4().hex}.{file_ext}")
+    img_url, img_id = upload_image(img_file, img_name)
 
-    # IMPORTANT TODO: Modify this once I get the CDN service up and running
-    current_dir = Path(__file__).resolve().parent
-    fp = current_dir / "cdn" / img_name
-    img_file.save(fp)
-    serialized_data["logo_path"] = str(fp)
+    serialized_data["logo_url"] = img_url
+    serialized_data["logo_id"] = img_id
 
     entry = Education(**serialized_data)
 
@@ -436,7 +438,6 @@ def edit_institute():
     try:
         serialized_data = schema.loads(data)
     except ValidationError as err:
-        print("err msgs: ", err.messages)
         return jsonify({"errors": err.messages}), 400
 
     institute = db.session.execute(
@@ -451,19 +452,13 @@ def edit_institute():
                 ).format("MMMM Y")
 
                 setattr(institute, field, parsed_date)
-            case "logo_path":
-                fp = serialized_data["logo_path"]
-                os.unlink(fp)
-
+            case "logo_url":
                 prefix = "image_"
                 unique_id = uuid.uuid4().hex
-                img_name = prefix + unique_id + ".png"
-
-                # IMPORTANT TODO: Modify this once I get the CDN service up and running
-                current_dir = Path(__file__).resolve().parent
-                new_fp = current_dir / "cdn" / img_name
-                img_file.save(new_fp)
-                setattr(institute, field, str(new_fp))
+                img_name = secure_filename(prefix + unique_id + ".png")
+                new_url, new_id = patch_image(img_file, img_name, institute.logo_id)
+                setattr(institute, field, new_url)
+                institute.logo_id = new_id
             case _:
                 setattr(institute, field, serialized_data[field])
 
@@ -493,8 +488,10 @@ def delete_institute():
 
     name = institute.name
 
-    # delete image. TODO: once CDN is up modify code to delete image from the CDN
-    os.unlink(institute.logo_path)
+    res = delete_image(institute.logo_id)
+
+    if not res:
+        return "", 500
 
     db.session.delete(institute)
     db.session.commit()
@@ -1005,9 +1002,7 @@ def edit_blog():
     parsed_fields = tuple(
         filter(lambda x: x not in ["has_image", "img_del", "content", "id"], raw_fields)
     )
-    print(parsed_fields)
     schema = BlogPostSchema(only=parsed_fields) if parsed_fields else BlogPostSchema()
-    print(schema.only)
     data = {
         key: value
         for key, value in request.form.items()
@@ -1031,7 +1026,11 @@ def edit_blog():
         if has_img == "True":
             data["content"] = patch_blog_images(content)
         elif img_del == "True":
-            delete_blog_images(content)
+            cur_data = json.loads(data["cur_data"])
+            res = delete_blog_images(cur_data)
+
+            if not res:
+                return "", 500
 
     if not data.get("title", False):
         data["title"] = current_blog.title

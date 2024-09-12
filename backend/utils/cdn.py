@@ -1,7 +1,7 @@
 """
 This module provides functions for interacting with a Content Delivery Network (CDN) to upload, patch, and delete images.
 
-It uses the Cloudflare API to perform these operations.
+It uses the imagekit API to perform these operations.
 
 Functions:
 - upload_image: Uploads an image to the CDN.
@@ -16,9 +16,12 @@ from typing import Any, Tuple, Union
 from urllib.parse import urlparse
 
 import requests
+import base64
 from dotenv import load_dotenv
 from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 from imagekitio import ImageKit
+from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 
 __all__ = [
     "upload_image",
@@ -32,90 +35,69 @@ __all__ = [
 # load env variables
 load_dotenv("..")
 
-API_TOKEN = os.getenv("CLOUDFLARE_TOKEN")
+PUBLIC_KEY = os.getenv("IMGKIT_PUBLIC_KEY")
+PRIVATE_KEY = os.getenv("IMGKIT_PRIVATE_KEY")
 IMGKIT_ID = os.getenv("IMGKIT_ID")
+URL_ENDPOINT = "https://ik.imagekit.io/{IMGKIT_ID}/"
+
+mime_to_extension = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/bmp": "bmp",
+    "image/webp": ".webp",
+    "image/tiff": ".tiff",
+    "image/svg+xml": ".svg",
+    "image/x-icon": ".ico",
+    "image/heif": ".heif",
+    "image/heic": ".heic",
+}
+
+imgkit = ImageKit(
+    private_key=PRIVATE_KEY, public_key=PUBLIC_KEY, url_endpoint=URL_ENDPOINT
+)
 
 
-def _get_cf_url(api_type: str) -> str:
-    """
-    Returns the Cloudflare URL based on the given API type.
-
-    Parameters:
-    - api_type (str): The type of API (either "image" or "file").
-
-    Returns:
-    - str: The Cloudflare URL for the specified API type.
-    """
-    match api_type:
-        case "image":
-            return f"https://ik.imagekit.io/{IMGKIT_ID}/"
-        case "image delete":
-            return "https://api/cloudflare.com/client/v4/accounts/{account_id}/images/v1/{image_id}".format(  # noqa: F523, F524
-                IMGKIT_ID
-            )
-
-
-def _match_image_return_type(return_type: str, variants: list[str]) -> str:
-    """
-    Matches the desired return type with the corresponding variant URL.
-
-    Args:
-        return_type (str): The desired return type of the image ("thumbnail", "hero", "full").
-        variants (List[str]): The list of variant URLs for the image.
-
-    Returns:
-        str: The URL of the image variant that matches the desired return type.
-    """
-    match return_type:
-        case "thumbnail":
-            img_url = variants[0]
-        case "hero":
-            img_url = variants[1]
-        case "full":
-            img_url = variants[-1]
-    return img_url
+def get_file_extension(mime_type):
+    extension = mime_to_extension.get(mime_type)
+    return extension if extension else "bin"
 
 
 def upload_image(
-    image: FileStorage, name: str, return_type: str
-) -> Union[Tuple[str, str] | bool]:
+    image: FileStorage, name: str, tag: Union[str, None] = None
+) -> Union[Tuple[str, str], bool]:
     """
     Uploads an image to the CDN using the provided image file, name, and return type.
 
     Args:
         image (FileStorage): The image file to be uploaded.
         name (str): The name of the image file.
-        return_type (str): The desired return type of the uploaded image ("thumbnail", "hero", "full").
 
     Returns:
         Union[Tuple[str, str], bool]: A tuple containing the image URL and ID if the upload is successful,
         otherwise False.
     """
     # construct request
-    cf_url = _get_cf_url("image")
+    options = UploadFileRequestOptions(
+        use_unique_file_name=True,
+        tags=["education" if not tag else tag],
+        folder="/imgs/",
+        is_private_file=False,
+        is_published=True,
+    )
 
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}",
-        "Content-Type": "multipart/form-data",
-    }
+    stream = base64.b64encode(image.stream.read())
 
-    files = {
-        "file": (
-            name,
-            image.stream,
-            image.content_type,
-        ),
-    }
+    # Make request
+    res = imgkit.upload_file(
+        file=stream,
+        file_name=name,
+        options=options,
+    )
 
-    # make request
-    res = requests.post(cf_url, headers=headers, files=files)
-
-    if res.status_code == 200:
-        img = res.json()["result"]["images"][0]
-        img_id: str = img["id"]
-        variants: list[str] = img["variants"]
-
-        img_url = _match_image_return_type(return_type, variants)
+    if res.response_metadata.http_status_code == 200:
+        img_id = res.file_id
+        img_url = res.url
         return (
             img_url,
             img_id,
@@ -125,7 +107,7 @@ def upload_image(
 
 
 def patch_image(
-    new_img: FileStorage, new_name: str, img_id: str, return_type: str
+    new_img: FileStorage, new_name: str, img_id: str, tag: Union[str, None] = None
 ) -> Union[Tuple[str, str] | bool]:
     """
     Patch an image in the CDN with a new image.
@@ -134,46 +116,27 @@ def patch_image(
         new_img (FileStorage): The new image file to be uploaded.
         new_name (str): The name of the new image.
         img_id (str): The ID of the old image to be replaced.
-        return_type (str): The desired return type for the patched image.
 
     Returns:
         Union[Tuple[str, str], bool]: A tuple containing the new URL and ID of the patched image if successful,
         otherwise False.
     """
-
+    # delete image
     res = delete_image(img_id)
 
     if not res:
         return False
 
-    # construct request
-    cf_url = _get_cf_url("image")
+    # reupload image
+    if not tag:
+        res = upload_image(new_img, new_name)
+    else:
+        res = upload_image(new_img, new_name, tag)
 
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}",
-        "Content-Type": "multipart/form-data",
-    }
-
-    files = {
-        "file": (
-            new_name,
-            new_img.stream,
-            new_img.content_type,
-        ),
-    }
-
-    # make request
-    res = requests.post(cf_url, headers=headers, files=files)
-
-    if res.status_code == 200:
-        img = res.json()["result"]["images"][0]
-        new_id: str = img["id"]
-        variants: list[str] = img["variants"]
-
-        new_url = _match_image_return_type(return_type, variants)
+    if res:
         return (
-            new_url,
-            new_id,
+            res[0],
+            res[1],
         )
     else:
         return False
@@ -189,19 +152,11 @@ def delete_image(img_id: str) -> bool:
     Returns:
         bool: True if the image was successfully deleted, False otherwise.
     """
-    # construct url
-    cf_url = _get_cf_url("image delete").format(image_id=img_id)
-
-    # construct request
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}",
-        "Content-Type": "application/json",
-    }
 
     # make request
-    res = requests.delete(cf_url, headers=headers)
+    res = imgkit.delete_file(img_id)
 
-    if res.status_code == 200:
+    if res.response_metadata.http_status_code == 204:
         return True
     return False
 
@@ -226,18 +181,18 @@ def upload_blog_images(data: list[dict[Any, str]]) -> list[dict[Any, str]] | int
                 if res.status_code == 200:
                     image = FileStorage(BytesIO(res.content))
 
-                    image_name = "image_" + uuid.uuid4().hex + ".png"
+                    image_name = secure_filename(f"image_{uuid.uuid4().hex}.png")
 
-                    cf_url, img_id = upload_image(image, image_name, "full")
-                    row["url"] = cf_url
+                    imgkit_url, img_id = upload_image(image, image_name, "blog")
+                    row["url"] = imgkit_url
                     row["id"] = img_id
                 else:
                     continue
             else:
                 image = FileStorage(BytesIO(bytes(row["url"])))
-                image_name = "image_" + uuid.uuid4().hex + ".png"
-                cf_url, img_id = upload_image(image, image_name, "full")
-                row["url"] = cf_url
+                image_name = secure_filename(f"image_{uuid.uuid4().hex}.png")
+                imgkit_url, img_id = upload_image(image, image_name, "blog")
+                row["url"] = imgkit_url
                 row["id"] = img_id
     return data
 
@@ -253,17 +208,17 @@ def patch_blog_images(data: list[dict[Any, str]]) -> list[dict[Any, str]]:
 
                 if res.status_code == 200:
                     image = FileStorage(BytesIO(res.content))
-                    image_name = "image_" + uuid.uuid4().hex + ".png"
+                    image_name = secure_filename(f"image_{uuid.uuid4().hex}.png")
 
-                    cf_url, img_id = patch_image(image, image_name, img_id, "full")
-                    row["url"] = cf_url
+                    imgkit_url, img_id = patch_image(image, image_name, img_id, "blog")
+                    row["url"] = imgkit_url
                     row["id"] = img_id
             else:
                 image = FileStorage(BytesIO(bytes(row["url"])))
-                image_name = "image_" + uuid.uuid4().hex + ".png"
+                image_name = secure_filename(f"image_{uuid.uuid4().hex}.png")
 
-                cf_url, img_id = patch_image(image, image_name, img_id, "full")
-                row["url"] = cf_url
+                imgkit_url, img_id = patch_image(image, image_name, img_id, "blog")
+                row["url"] = imgkit_url
                 row["id"] = img_id
     return data
 
@@ -283,5 +238,4 @@ def delete_blog_images(data: list[dict[Any, str]]) -> bool:
 
             if not res:
                 return False
-
     return True

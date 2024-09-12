@@ -225,9 +225,14 @@ const Contact: React.FC = () => {
 						</div>
 					</div>
 				</form>
-				<div className="pt-10 pl-10">
-					<p className="italic font-ibm-plex-serif text-slate-100 tracking-tight">
-						For larger inquires, feel free contact me at: <a className="underline underline-offset-1 decoration-sky-300 text-sky-300" href="mailto:contact@sleylanguren.com">contact@sleylanguren.com</a>
+				<div className="pl-10 pt-10">
+					<p className="font-ibm-plex-serif italic tracking-tight text-slate-100">
+						For larger inquires, feel free contact me at:{' '}
+						<a
+							className="text-sky-300 underline decoration-sky-300 underline-offset-1"
+							href="mailto:contact@sleylanguren.com">
+							contact@sleylanguren.com
+						</a>
 					</p>
 				</div>
 			</Section>

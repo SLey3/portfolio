@@ -1,14 +1,11 @@
 import { Editor } from '@/components/plate-ui/editor';
-import useBlog from '@/utils/hooks/use-blog';
 import plugins from '@/utils/plate/plugins';
 import { CommentsProvider } from '@udecode/plate-comments';
-import { Plate, Value } from '@udecode/plate-common';
+import { Plate } from '@udecode/plate-common';
 import React, { Suspense } from 'react';
 
 const BlogViewer: React.FC<BlogViewerProps> = ({ content }) => {
-	const blog = useBlog<Value | null>(content);
-
-	if (!blog) {
+	if (!content) {
 		return null;
 	}
 
@@ -22,7 +19,7 @@ const BlogViewer: React.FC<BlogViewerProps> = ({ content }) => {
 						</p>
 					</>
 				}>
-				<Plate initialValue={blog} plugins={plugins} readOnly>
+				<Plate initialValue={content} plugins={plugins} readOnly>
 					<CommentsProvider>
 						<Editor
 							autoFocus

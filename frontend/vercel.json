@@ -1,6 +1,10 @@
 {
-    "rewrites": [
-      { "source" : "/api/(.*)", "destination" : "https://api.sleylanguren.com/$1"},
-      { "source": "/(.*)", "destination": "/" }
-    ]
+	"rewrites": [
+		{
+			"source": "/api/(.*)",
+			"destination": "https://api.sleylanguren.com/$1"
+		},
+		{ "source": "/(.*)", "destination": "/" },
+		{ "source": "/assets/(.*)", "destination": "/src/assets" }
+	]
 }

@@ -97,7 +97,6 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 		if (data.logo_path) {
 			formdata.append('file', data.logo_path);
 			edited_fields.push('logo_path');
-			parsed_data.set('logo_path', formInfo.logo_path);
 		}
 
 		if (data.institute_url) {
@@ -143,6 +142,11 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 				}, 5500);
 			})
 			.catch((err: AxiosError) => {
+				if (err.response?.status === 500) {
+					toast.error(
+						'Something went wrong with the API. Check backend logs. (Status Code 500)'
+					);
+				}
 				SetFormErrors<InstituteEditProps>(err, setError);
 			});
 	};
