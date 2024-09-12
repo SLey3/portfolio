@@ -242,7 +242,7 @@ const EducationAddForm: React.FC<FormProps> = ({
 																'') ||
 														'Either expected or Graduation date field must be blank!',
 													year_diff: (value, values) => 
-														parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
+														value !== "" && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
 														'Graduation Date must be at least 4 years apart!',
 												}
 											})}
@@ -291,7 +291,8 @@ const EducationAddForm: React.FC<FormProps> = ({
 													message:
 														'Format must be MM/YYYY!',
 												},
-												validate: (value, values) =>
+												validate: {
+													not_both: (value, values) =>
 													(value !== '' &&
 														values.grad_date ===
 															'') ||
@@ -299,6 +300,10 @@ const EducationAddForm: React.FC<FormProps> = ({
 														values.grad_date !==
 															'') ||
 													'Either expected or Graduation date field must be blank!',
+													year_diff: (value, values) =>
+														value && value !== "" && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
+														'Expected Graduation Date must be at least 4 years old',
+												}
 											})}
 											aria-invalid={
 												errors.expected_date
