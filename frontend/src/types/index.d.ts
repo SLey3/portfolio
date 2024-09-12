@@ -88,6 +88,7 @@ declare global {
 	interface CourseAddProps extends CourseProps {}
 
 	interface InstituteAddProps extends InstituteProps {
+		grad_date?: string;
 		expected_date?: string;
 		awards?: string;
 		major?: string;
