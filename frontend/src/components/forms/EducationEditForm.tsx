@@ -2,14 +2,13 @@ import { SetFormErrors } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import {
 	Button,
-	FileInput,
 	HR,
 	Label,
 	TextInput,
 	Textarea,
 } from 'flowbite-react';
-import React from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import React, { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaAward } from 'react-icons/fa';
 import { FcDiploma1 } from 'react-icons/fc';
 import { IoIosLink } from 'react-icons/io';
@@ -23,13 +22,13 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 	setVisibility,
 	formInfo,
 }) => {
+	const [file, setFile] = useState<File | null>(null);
 	const {
 		register,
 		formState: { errors },
 		handleSubmit,
 		setError,
 		reset,
-		control,
 	} = useForm<InstituteEditProps>({
 		defaultValues: {
 			name: formInfo.name,
@@ -40,7 +39,7 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 			awards: formInfo.awards,
 			major: formInfo.major,
 			degree: formInfo.degree,
-			logo_path: formInfo.logo_path,
+			logo_url: formInfo.logo_url,
 			institute_url: formInfo.institute_url,
 			small_desc: formInfo.small_desc,
 		},
@@ -94,9 +93,9 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 			formdata.append('degree', data.degree);
 		}
 
-		if (data.logo_path) {
-			formdata.append('file', data.logo_path);
-			edited_fields.push('logo_path');
+		if (file) {
+			formdata.append('file', file);
+			edited_fields.push('logo_url');
 		}
 
 		if (data.institute_url) {
@@ -149,6 +148,13 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 				}
 				SetFormErrors<InstituteEditProps>(err, setError);
 			});
+	};
+
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
+			setFile(e.target.files[0]);
+		}
 	};
 
 	const handleCancel = () => {
@@ -271,17 +277,19 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 													message:
 														'Format must be MM/YYYY!',
 												},
-												validate: (value, values) =>
-													(value === '' &&
-														values.expected_date ===
-															'') ||
-													(value !== '' &&
-														values.expected_date ===
-															'') ||
-													(value === '' &&
-														values.expected_date !==
-															'') ||
-													'Either expected or Graduation date field must be blank!',
+												validate: {
+													not_both: (value, values) =>
+														(value !== '' &&
+															values.expected_date ===
+																'') ||
+														(value === '' &&
+															values.expected_date !==
+																'') ||
+														'Either expected or Graduation date field must be blank!',
+													year_diff: (value, values) => 
+														value && values.start_date && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
+														'Graduation Date must be at least 4 years apart!',
+												}
 											})}
 											aria-invalid={
 												errors.grad_date
@@ -472,39 +480,11 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 											value="Institute Logo"
 										/>
 									</div>
-									<Controller
-										control={control}
-										name="logo_path"
-										render={({
-											field: {
-												value,
-												onChange,
-												...field
-											},
-										}) => {
-											return (
-												<FileInput
-													accept="image/*"
-													id="logo"
-													sizing="sm"
-													value={
-														typeof value === 'string' ? value : value?.name
-													}
-													{...field}
-													onChange={(e) => {
-														if (
-															e.target.files &&
-															e.target.files[0]
-														) {
-															onChange(
-																e.target
-																	.files[0]
-															);
-														}
-													}}
-												/>
-											);
-										}}
+									<input
+										accept="image/*"
+										id="logo"
+										onChange={handleFileChange}
+										type="file"
 									/>
 								</div>
 								<div>
