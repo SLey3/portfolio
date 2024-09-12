@@ -12,7 +12,7 @@ Functions:
 import os
 import uuid
 from io import BytesIO
-from typing import Any, Tuple, Union
+from typing import Any, Tuple, Union, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -64,7 +64,7 @@ def get_file_extension(mime_type):
 
 
 def upload_image(
-    image: FileStorage, name: str, tag: Union[str, None] = None
+    image: FileStorage, name: str, tag: Optional[str] = None
 ) -> Union[Tuple[str, str], bool]:
     """
     Uploads an image to the CDN using the provided image file, name, and return type.
@@ -80,7 +80,7 @@ def upload_image(
     # construct request
     options = UploadFileRequestOptions(
         use_unique_file_name=True,
-        tags=["education" if not tag else tag],
+        tags=[tag if tag else "education"],
         folder="/imgs/",
         is_private_file=False,
         is_published=True,
@@ -107,7 +107,7 @@ def upload_image(
 
 
 def patch_image(
-    new_img: FileStorage, new_name: str, img_id: str, tag: Union[str, None] = None
+    new_img: FileStorage, new_name: str, img_id: str, tag: Optional[str] = None
 ) -> Union[Tuple[str, str] | bool]:
     """
     Patch an image in the CDN with a new image.
