@@ -429,10 +429,11 @@ def edit_institute():
     Returns:
         A JSON response indicating the success of the operation.
     """
-    fields = request.form.get("fields")
+    _fields = request.form.get("fields")
     img_file = request.files.get("file")
     data = request.form.get("other")
-    parsed_fields = tuple(json.loads(fields))
+    parsed_fields = tuple(json.loads(_fields))
+    fields = tuple(filter(lambda x: x != "logo_url", parsed_fields))
     schema = EducationSchema(only=parsed_fields)
 
     try:
@@ -444,7 +445,7 @@ def edit_institute():
         db.select(Education).filter_by(id=int(serialized_data["id"]))
     ).scalar()
 
-    for field in schema.only:
+    for field in fields:
         match field:
             case "start_date" | "grad_date" | "expected_date":
                 parsed_date = pendulum.from_format(
