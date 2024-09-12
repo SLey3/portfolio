@@ -35,8 +35,7 @@ const Education: React.FC = () => {
 		awards: '',
 		major: '',
 		degree: '',
-		logo_path: '',
-		logo_file: '',
+		logo_url: '',
 		institute_url: '',
 		small_desc: '',
 		created_at: '',
@@ -53,7 +52,6 @@ const Education: React.FC = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const imgURLS: string[] = [];
 		const allCourses: CourseProps[] = [];
 
 		axios
@@ -61,24 +59,9 @@ const Education: React.FC = () => {
 			.then(async (res: AxiosResponse) => {
 				const institutes = res.data;
 
-				// TODO: once CDN service is up, modify this to set the imgUrl directly to the data which is expected to be a string
 				const fullInstitutes = await Promise.all(
 					institutes.map(async (entry: InstituteProps) => {
 						try {
-							const imgRes = await axios.post(
-								'/api/image',
-								{ fp: entry.logo_path },
-								{
-									headers: {
-										'Content-Type': 'application/json',
-									},
-									responseType: 'blob',
-								}
-							);
-
-							const imgUrl = URL.createObjectURL(imgRes.data);
-							imgURLS.push(imgUrl);
-
 							// make string array into an actual array
 							let awards = entry.awards;
 							if (!Array.isArray(awards)) {
@@ -106,7 +89,6 @@ const Education: React.FC = () => {
 
 							return {
 								...entry,
-								logo_file: imgUrl,
 								awards: awards,
 							};
 						} catch (err) {
@@ -121,12 +103,6 @@ const Education: React.FC = () => {
 			.catch((err: AxiosError) => {
 				console.error(err.response?.data);
 			});
-
-		return () => {
-			for (const imgUrl of imgURLS) {
-				URL.revokeObjectURL(imgUrl);
-			}
-		};
 	}, []);
 
 	const handleEduEditClick = (e: React.MouseEvent, item: InstituteProps) => {
@@ -255,7 +231,7 @@ const Education: React.FC = () => {
 													<img
 														alt={`${entry.name} logo`}
 														className="size-20 translate-x-3/4 lg:size-32 lg:translate-x-0"
-														src={entry.logo_file}
+														src={entry.logo_url}
 													/>
 												</div>
 												<div className="flex flex-col gap-y-1">

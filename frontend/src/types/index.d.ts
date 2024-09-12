@@ -25,8 +25,7 @@ declare global {
 		awards: string;
 		major: string;
 		degree: string;
-		logo_path: string;
-		logo_file: string;
+		logo_url: string;
 		institute_url: string;
 		small_desc: string;
 		created_at: string;

@@ -5,7 +5,6 @@ import { FixedToolbarButtons } from '@/components/plate-ui/fixed-toolbar-buttons
 import { FloatingToolbar } from '@/components/plate-ui/floating-toolbar';
 import { FloatingToolbarButtons } from '@/components/plate-ui/floating-toolbar-buttons';
 import { TooltipProvider } from '@/components/plate-ui/tooltip';
-import { useBlogWithCallback } from '@/utils/hooks/use-blog';
 import plugins from '@/utils/plate/plugins';
 import { CommentsProvider } from '@udecode/plate-comments';
 import { Plate, Value } from '@udecode/plate-common';
@@ -14,11 +13,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const TextEditor: React.FC<TextEditorProps> = ({ setContent, editValues }) => {
-	const editorValues = useBlogWithCallback<Value | null>(
-		editValues as Value | null
-	);
-
-	const initialValue = editorValues || [
+	const initialValue = editValues || [
 		{
 			id: '1',
 			type: 'p',

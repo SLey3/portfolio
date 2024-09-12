@@ -11,6 +11,9 @@ from app import db, ma
 # get local tz
 local_tz = pendulum.local_timezone()
 
+# temp
+is_postgres = False
+
 
 # database models
 class Admin(db.Model):
@@ -67,7 +70,10 @@ class BlogPost(db.Model):
     created_at: Mapped[str] = mapped_column(
         default=pendulum.now(local_tz).format("LL LTS zz")
     )
-    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
+    if is_postgres:
+        content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
+    else:
+        content: Mapped[dict] = mapped_column(db.JSON(), unique=True, nullable=False)
     desc: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_draft: Mapped[bool] = mapped_column(nullable=False, default=False)
 
@@ -86,7 +92,8 @@ class Education(db.Model):
         :awards: Honors & awards received
         :major: name of major (if applicable)
         :degree: type of degree earned or expected
-        :logo_path: Path where logo image is stored
+        :logo_url: Img CDN url
+        :logo_id: img cdn id
         :institute_url: Url of the website of the institution
         :small_desc: Small description of the institution
         :created_at: date row was created
@@ -103,7 +110,8 @@ class Education(db.Model):
     awards: Mapped[str] = mapped_column(nullable=False)
     major: Mapped[Optional[str]] = mapped_column()
     degree: Mapped[str] = mapped_column(nullable=False)
-    logo_path: Mapped[str] = mapped_column(nullable=False)
+    logo_url: Mapped[str] = mapped_column(nullable=False)
+    logo_id: Mapped[str] = mapped_column(nullable=False)
     institute_url: Mapped[str] = mapped_column(unique=True, nullable=False)
     small_desc: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[str] = mapped_column(

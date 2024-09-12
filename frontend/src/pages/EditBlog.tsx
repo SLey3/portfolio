@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import { RemoveBlogUrls, SetFormErrors } from '@/utils';
+import { SetFormErrors } from '@/utils';
 import type { Value } from '@udecode/plate-common';
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
 import { Button, Checkbox, Label, TextInput, Textarea } from 'flowbite-react';
@@ -64,8 +64,7 @@ const EditBlog: React.FC = () => {
 
 		setIsProcessing(true);
 		const formdata = new FormData();
-		const content = RemoveBlogUrls(blogContent, false);
-		const mod_content = JSON.stringify(content).trim();
+		const mod_content = JSON.stringify(blogContent).trim();
 		const cur_content = JSON.stringify(blogInfo?.content).trim();
 		const fields = ['id'];
 		const BearerToken = localStorage.getItem('token');
@@ -94,6 +93,7 @@ const EditBlog: React.FC = () => {
 				if (cur_content.match(/,"type":"img",/)) {
 					console.log('current blog had img when mod_blog did not');
 					formdata.append('img_del', 'True');
+					formdata.append('cur_data', cur_content);
 				}
 			}
 		}
@@ -126,6 +126,13 @@ const EditBlog: React.FC = () => {
 				}, 5500);
 			})
 			.catch((err: AxiosError) => {
+				if (err.response?.status === 500) {
+					toast.error(
+						'(backend failure) Something went wrong. Check Backend logs.'
+					);
+					return;
+				}
+
 				SetFormErrors<BlogEditProps>(err, setError);
 				setIsProcessing(false);
 			});

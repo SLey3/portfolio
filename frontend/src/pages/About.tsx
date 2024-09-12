@@ -1,7 +1,6 @@
 import WebFooter from '@/components/Footer';
 import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
-import { GetAssetsUrl } from '@/utils';
 import React from 'react';
 
 const AboutMe: React.FC = () => {
@@ -14,7 +13,7 @@ const AboutMe: React.FC = () => {
 					<img
 						alt="Portfolio Self"
 						className="aspect-square size-full px-10 pl-6 md:float-left md:size-1/3"
-						src={GetAssetsUrl('portfolio-self.jpeg')}
+						src="https://ik.imagekit.io/8jh2j8rnw/imgs/portfolio-self.jpeg?updatedAt=1725932890045"
 					/>
 					<div className="pb-16">
 						<p className="text-balance pt-10 font-ibm-plex-serif font-light leading-7 tracking-widest text-slate-100 subpixel-antialiased">
