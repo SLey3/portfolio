@@ -234,6 +234,7 @@ const EducationAddForm: React.FC<FormProps> = ({
 												},
 												validate: {
 													not_both: (value, values) =>
+														value &&
 														(value !== '' &&
 															values.expected_date ===
 																'') ||
@@ -241,9 +242,16 @@ const EducationAddForm: React.FC<FormProps> = ({
 															values.expected_date !==
 																'') ||
 														'Either expected or Graduation date field must be blank!',
-													year_diff: (value, values) => 
-														value && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
-														'Graduation Date must be at least 4 years apart!',
+														year_diff: (value, values) => {
+															if (typeof value === 'undefined' || value === "") {
+																return true;
+															}
+														
+															const gradYear = parseInt(value.split("/")[1]);
+															const startYear = parseInt(values.start_date.split("/")[1]);
+														
+															return (gradYear - startYear >= 4) || 'Graduation Date must be at least 4 years apart!';
+														}
 												}
 											})}
 											aria-invalid={
@@ -293,16 +301,25 @@ const EducationAddForm: React.FC<FormProps> = ({
 												},
 												validate: {
 													not_both: (value, values) =>
+													value &&
 													(value !== '' &&
 														values.grad_date ===
 															'') ||
 													(value === '' &&
 														values.grad_date !==
 															'') ||
-													'Either expected or Graduation date field must be blank!',
-													year_diff: (value, values) =>
-														value && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
-														'Expected Graduation Date must be at least 4 years old',
+													'Either Expected or Graduation date field must be blank!',
+													year_diff: (value, values) => {
+														if (typeof value === 'undefined' || value === "") {
+															
+															return true;
+														}
+													
+														const expectedYear = parseInt(value.split("/")[1]);
+														const startYear = parseInt(values.start_date.split("/")[1]);
+													
+														return (expectedYear - startYear >= 4) || 'Expected Date must be at least 4 years apart!';
+													}
 												}
 											})}
 											aria-invalid={
