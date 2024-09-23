@@ -10,6 +10,7 @@ import Login from '@/pages/Login';
 import Projects from '@/pages/Projects';
 import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
+import Http404 from '@/pages/http/404';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
 					<Route Component={Contact} path="/contact" />
 					<Route Component={AboutMe} path="/about" />
 					<Route Component={Login} path="/login" />
+					<Route Component={Http404} path="/*" />
 				</Routes>
 			</Router>
 		</>

@@ -344,9 +344,6 @@ def institute_add():
     data = request.form.get("other")
     img_file = request.files.get("file")
 
-    print("img name: ", img_file.filename)
-    print("img file obj: ", img_file)
-
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
@@ -932,6 +929,9 @@ def get_blogs():
 
     if not total_pages:
         return jsonify({"error": "No data was provided!"}), 400
+
+    if total_blogs == 0:
+        return jsonify({"bypass": "No blogs exists currently."}), 204
 
     blog_posts = show_blog_posts(BlogPost, db.engine, total_pages)
 

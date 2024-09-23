@@ -1,12 +1,6 @@
 import { SetFormErrors } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import {
-	Button,
-	HR,
-	Label,
-	TextInput,
-	Textarea,
-} from 'flowbite-react';
+import { Button, HR, Label, TextInput, Textarea } from 'flowbite-react';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaAward } from 'react-icons/fa';
@@ -150,7 +144,6 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 			});
 	};
 
-
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			setFile(e.target.files[0]);
@@ -286,9 +279,18 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 															values.expected_date !==
 																'') ||
 														'Either expected or Graduation date field must be blank!',
-													year_diff: (value, values) => 
-														value && values.start_date && parseInt(value.split("/")[1]) - parseInt(values.start_date.split("/")[1]) >= 4 ||
-														'Graduation Date must be at least 4 years apart!',
+													year_diff: (value, values) => {
+														if (typeof value === 'undefined' || value === "") {
+															
+															return true;
+														}
+														
+														const start_date = values.start_date || formInfo.start_date;
+														const expectedYear = parseInt(value.split("/")[1]);
+														const startYear = parseInt(start_date.split("/")[1]);
+													
+														return (expectedYear - startYear >= 4) || 'Graduation Date must be at least 4 years apart!';
+													}
 												}
 											})}
 											aria-invalid={
@@ -336,17 +338,31 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 													message:
 														'Format must be MM/YYYY!',
 												},
-												validate: (value, values) =>
-													(value === '' &&
-														values.grad_date ===
-															'') ||
-													(value !== '' &&
-														values.grad_date ===
-															'') ||
-													(value === '' &&
-														values.grad_date !==
-															'') ||
-													'Either expected or Graduation date field must be blank!',
+												validate: {
+													not_both: (value, values) =>
+														(value === '' &&
+															values.grad_date ===
+																'') ||
+														(value !== '' &&
+															values.grad_date ===
+																'') ||
+														(value === '' &&
+															values.grad_date !==
+																'') ||
+														'Either expected or Graduation date field must be blank!',
+													year_diff: (value, values) => {
+														if (typeof value === 'undefined' || value === "") {
+															
+															return true;
+														}
+														
+														const start_date = values.start_date || formInfo.start_date;
+														const expectedYear = parseInt(value.split("/")[1]);
+														const startYear = parseInt(start_date.split("/")[1]);
+													
+														return (expectedYear - startYear >= 4) || 'Expected Date must be at least 4 years apart!';
+													}
+												}
 											})}
 											aria-invalid={
 												errors.expected_date
