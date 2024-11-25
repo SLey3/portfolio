@@ -7,6 +7,7 @@ import CertLicenseEditForm from '@/components/forms/CertLicenseEditForm';
 import WorkExperienceAddForm from '@/components/forms/WorkExperienceAddForm';
 import WorkExperienceEditForm from '@/components/forms/WorkExperienceEditForm';
 import Section from '@/components/section';
+import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Flowbite, Timeline } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
@@ -114,6 +115,7 @@ const Experience: React.FC = () => {
 	});
 	const [cookies] = useCookies(['user']);
 	const navigate = useNavigate();
+	const BearerToken = useAuthToken();
 
 	useEffect(() => {
 		axios
@@ -149,7 +151,6 @@ const Experience: React.FC = () => {
 	const handleWorkExperienceDelete = useCallback(
 		(e: React.MouseEvent, item_id: number) => {
 			e.preventDefault();
-			const BearerToken = localStorage.getItem('token');
 
 			axios
 				.delete('/api/experience/delete', {
@@ -173,7 +174,7 @@ const Experience: React.FC = () => {
 					toast.error(res?.error);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	const handleCertEdit = (e: React.MouseEvent, item: CertLicenseProps) => {
@@ -185,7 +186,6 @@ const Experience: React.FC = () => {
 	const handleCertDelete = useCallback(
 		(e: React.MouseEvent, item_id: number) => {
 			e.preventDefault();
-			const BearerToken = localStorage.getItem('token');
 
 			axios
 				.delete('/api/cert/delete', {
@@ -210,7 +210,7 @@ const Experience: React.FC = () => {
 					toast.error(res?.error);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	return (

@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import ProjectsAddForm from '@/components/forms/ProjectsAddForm';
 import ProjectsEditForm from '@/components/forms/ProjectsEditForm';
+import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Pagination } from 'flowbite-react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -34,6 +35,7 @@ const Projects: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [cookies] = useCookies(['user']);
 	const navigate = useNavigate();
+	const BearerToken = useAuthToken();
 
 	const onPageChange = (page: number) => setCurrentPage(page);
 
@@ -79,7 +81,6 @@ const Projects: React.FC = () => {
 	const handleProjectDelete = useCallback(
 		(e: React.MouseEvent, item_id: number) => {
 			e.preventDefault();
-			const BearerToken = localStorage.getItem('token');
 
 			axios
 				.delete('/api/projects/delete', {
@@ -104,7 +105,7 @@ const Projects: React.FC = () => {
 					toast.error(res?.error);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	return (

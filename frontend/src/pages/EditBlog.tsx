@@ -4,36 +4,38 @@ import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
 import { SetFormErrors } from '@/utils';
-import type { Value } from '@udecode/plate-common';
+import useAuthToken from '@/utils/hooks/use-auth-token';
+import { useTextEditor } from '@/utils/plate/editor';
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
 import { Button, Checkbox, Label, TextInput, Textarea } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
-import { type SubmitHandler, useForm } from 'react-hook-form';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import {
+	Link,
+	useNavigate,
+	useParams,
+	useSearchParams,
+} from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const EditBlog: React.FC = () => {
-	const [blogInfo, setBlogInfo] = useState<BlogList | null>(null);
-	const [blogContent, setBlogContent] = useState<Value>([]);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [blogInfo, setBlogInfo] = useState<BlogList | null>(null);
 	const {
 		register,
 		formState: { errors },
 		handleSubmit,
 		setError,
-	} = useForm<BlogEditProps>({
-		defaultValues: {
-			title: blogInfo?.title,
-			desc: blogInfo?.desc,
-			is_draft: blogInfo?.is_draft,
-		},
-	});
+		control,
+	} = useForm<BlogEditProps>();
 	const { blogId } = useParams();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
+	const BearerToken = useAuthToken();
+	const editor = useTextEditor();
 
 	useEffect(() => {
-		const BearerToken = localStorage.getItem('token');
 		axios
 			.get('/api/blog/singular', {
 				params: {
@@ -46,7 +48,11 @@ const EditBlog: React.FC = () => {
 			})
 			.then((res: AxiosResponse) => {
 				setBlogInfo(res.data);
-				toast.info('blog data loaded!');
+				editor.children = JSON.parse(res.data.content);
+				toast.info('blog data loaded!', {
+					closeButton: false,
+					closeOnClick: false,
+				});
 			})
 			.catch((err: AxiosError) => {
 				const res = err.response?.data as {
@@ -55,7 +61,7 @@ const EditBlog: React.FC = () => {
 				toast.error(res.error);
 				console.error(err.response?.data);
 			});
-	}, [blogId]);
+	}, [editor, BearerToken, blogId]);
 
 	const onSubmit: SubmitHandler<BlogEditProps> = (data) => {
 		if (!blogInfo) {
@@ -64,12 +70,9 @@ const EditBlog: React.FC = () => {
 
 		setIsProcessing(true);
 		const formdata = new FormData();
-		const mod_content = JSON.stringify(blogContent).trim();
+		const mod_content = JSON.stringify(editor.children).trim();
 		const cur_content = JSON.stringify(blogInfo?.content).trim();
 		const fields = ['id'];
-		const BearerToken = localStorage.getItem('token');
-
-		console.log(mod_content);
 
 		if (data.title !== blogInfo?.title && data.title) {
 			formdata.append('title', data.title);
@@ -79,7 +82,7 @@ const EditBlog: React.FC = () => {
 			formdata.append('desc', data.desc);
 		}
 
-		if (data.is_draft !== blogInfo?.is_draft) {
+		if (data.is_draft !== blogInfo?.is_draft && data.is_draft) {
 			formdata.append('is_draft', `${data.is_draft}`);
 		}
 
@@ -122,7 +125,9 @@ const EditBlog: React.FC = () => {
 				setIsProcessing(false);
 
 				setTimeout(() => {
-					return navigate('/blog');
+					return searchParams.get('f_a') === 'true'
+						? navigate('/admin/management')
+						: navigate(`/blog/view?id=${blogInfo?.id}`);
 				}, 5500);
 			})
 			.catch((err: AxiosError) => {
@@ -147,7 +152,7 @@ const EditBlog: React.FC = () => {
 					title="Edit Blog"
 				/>
 				{/* prettier-ignore */}
-				{/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+				{}
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<div className="container mx-auto space-y-5 py-5">
 						<div>
@@ -204,15 +209,22 @@ const EditBlog: React.FC = () => {
 					</div>
 					{blogInfo ? (
 						<TextEditor
-							editValues={blogInfo.content}
-							setContent={setBlogContent}
+							editor={editor}
+							footerText={`editing blog: ${blogInfo.title}`}
 						/>
 					) : null}
 					<div className="px-3 py-5">
-						<Checkbox
-							defaultChecked={blogInfo?.is_draft}
-							id="is-draft"
-							{...register('is_draft')}
+						<Controller
+							control={control}
+							defaultValue={blogInfo?.is_draft ? false : true}
+							name="is_draft"
+							render={({ field: { onChange, value } }) => (
+								<Checkbox
+									checked={value}
+									id="is-draft"
+									onChange={onChange}
+								/>
+							)}
 						/>
 						<Label
 							className="px-3 font-barlow text-white"
@@ -237,7 +249,11 @@ const EditBlog: React.FC = () => {
 								color="gray"
 								pill
 								size="sm"
-								to={`/blog/view?id=${blogInfo?.id}`}>
+								to={
+									searchParams.get('f_a') === 'true'
+										? '/admin/management'
+										: `/blog/view?id=${blogInfo?.id}`
+								}>
 								Cancel
 							</Button>
 						</div>

@@ -1,10 +1,13 @@
 import { Editor } from '@/components/plate-ui/editor';
-import plugins from '@/utils/plate/plugins';
-import { CommentsProvider } from '@udecode/plate-comments';
-import { Plate } from '@udecode/plate-common';
+import { useTextEditor } from '@/utils/plate/editor';
+import { CommentProvider } from '@udecode/plate-comments/react';
+import { Plate } from '@udecode/plate-common/react';
 import React, { Suspense } from 'react';
 
 const BlogViewer: React.FC<BlogViewerProps> = ({ content }) => {
+	const editor = useTextEditor();
+	editor.children = JSON.parse(content);
+
 	if (!content) {
 		return null;
 	}
@@ -19,14 +22,14 @@ const BlogViewer: React.FC<BlogViewerProps> = ({ content }) => {
 						</p>
 					</>
 				}>
-				<Plate initialValue={content} plugins={plugins} readOnly>
-					<CommentsProvider>
+				<Plate editor={editor} readOnly>
+					<CommentProvider>
 						<Editor
 							autoFocus
 							className="bg-newspaper bg-repeat font-cormorant-garamond shadow-2xl shadow-gray-900 grayscale sepia"
 							variant="ghost"
 						/>
-					</CommentsProvider>
+					</CommentProvider>
 				</Plate>
 			</Suspense>
 		</>

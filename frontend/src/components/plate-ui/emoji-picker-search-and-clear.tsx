@@ -1,37 +1,42 @@
-import { Icons } from '@/components/icons';
+import type { UseEmojiPickerType } from '@udecode/plate-emoji/react';
+
 import { cn } from '@udecode/cn';
-import type { UseEmojiPickerType } from '@udecode/plate-emoji';
+
+import { Button } from './button';
+import { emojiSearchIcons } from './emoji-icons';
 
 export type EmojiPickerSearchAndClearProps = Pick<
-	UseEmojiPickerType,
-	'clearSearch' | 'i18n' | 'searchValue'
+  UseEmojiPickerType,
+  'clearSearch' | 'i18n' | 'searchValue'
 >;
 
 export function EmojiPickerSearchAndClear({
-	clearSearch,
-	i18n,
-	searchValue,
+  clearSearch,
+  i18n,
+  searchValue,
 }: EmojiPickerSearchAndClearProps) {
-	return (
-		<>
-			<span
-				className={cn(
-					'absolute left-2 top-1/2 z-10 flex size-5 -translate-y-1/2'
-				)}>
-				<Icons.search />
-			</span>
-			{searchValue && (
-				<button
-					aria-label="Clear"
-					className={cn(
-						'absolute right-0 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer border-none bg-transparent'
-					)}
-					onClick={clearSearch}
-					title={i18n.clear}
-					type="button">
-					<Icons.clear className="size-full" />
-				</button>
-			)}
-		</>
-	);
+  return (
+    <div className="flex items-center text-foreground">
+      <div
+        className={cn(
+          'absolute left-2.5 top-1/2 z-10 flex size-5 -translate-y-1/2 items-center justify-center text-foreground'
+        )}
+      >
+        {emojiSearchIcons.loupe}
+      </div>
+      {searchValue ? <Button
+          aria-label="Clear"
+          onClick={clearSearch}
+          size="icon"
+          title={i18n.clear}
+          type="button"
+          variant="ghost"
+          className={cn(
+            'absolute right-0.5 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-popover-foreground hover:bg-transparent'
+          )}
+        >
+          {emojiSearchIcons.delete}
+        </Button> : null}
+    </div>
+  );
 }

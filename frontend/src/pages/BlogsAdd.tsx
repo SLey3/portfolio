@@ -3,7 +3,8 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import type { Value } from '@udecode/plate-common';
+import useAuthToken from '@/utils/hooks/use-auth-token';
+import { useTextEditor } from '@/utils/plate/editor';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Label, TextInput, Textarea } from 'flowbite-react';
 import React, { useState } from 'react';
@@ -13,7 +14,6 @@ import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const BlogAdd: React.FC = () => {
-	const [content, setContent] = useState<Value>([]);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isDraft, setIsDraft] = useState(false);
 	const navigate = useNavigate();
@@ -22,14 +22,15 @@ const BlogAdd: React.FC = () => {
 		formState: { errors },
 		handleSubmit,
 	} = useForm<BlogAddFormProps>();
+	const BearerToken = useAuthToken();
+	const editor = useTextEditor();
 
 	const onSubmit: SubmitHandler<BlogAddFormProps> = (data) => {
 		setIsProcessing(true);
 		const formdata = new FormData();
-		const BearerToken = localStorage.getItem('token');
 
 		formdata.append('title', data.title);
-		formdata.append('content', JSON.stringify(content));
+		formdata.append('content', JSON.stringify(editor.children));
 		formdata.append('desc', data.desc);
 		formdata.append('is_draft', `${isDraft}`);
 
@@ -61,7 +62,7 @@ const BlogAdd: React.FC = () => {
 				<NavBar />
 				<Header desc="Blog Post Creation Page" title="Add Blog Post" />
 				{/* prettier-ignore */}
-				<form onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
+				<form onSubmit={handleSubmit(onSubmit)}> { }
 					<div className="container mx-auto space-y-5 py-5">
 						<div>
 							<div className="mb-3 block">
@@ -127,7 +128,7 @@ const BlogAdd: React.FC = () => {
 							/>
 						</div>
 					</div>
-					<TextEditor setContent={setContent} />
+					<TextEditor editor={editor} />
 					<div className="flex flex-col justify-center gap-10 py-10 md:flex-row md:flex-wrap md:justify-evenly">
 						<div>
 							<Button

@@ -1,29 +1,31 @@
 import hashlib
 import json
 import uuid
-from urllib.parse import quote
-from werkzeug.utils import secure_filename
 
 import pendulum
 from flask import Blueprint, current_app, jsonify, request
 from flask_mail import Message
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
 
 from app import db, mail
 from models import *  # noqa: F403 | I did this as all models and schemas will be used in this file
 from utils.auth import login_required, login_user, logout_user
 from utils.cdn import (
     delete_blog_images,
-    patch_blog_images,
-    upload_blog_images,
-    upload_image,
-    patch_image,
     delete_image,
     get_file_extension,
+    patch_blog_images,
+    patch_image,
+    upload_blog_images,
+    upload_image,
 )
+from utils.newsletter import generate_unsubscribe_token, verify_token
 from utils.sql import (
+    execute_select,
     get_total_blog_posts,
     get_total_project_pages,
+    inspect_links,
     paginate_project_posts,
     show_blog_posts,
 )
@@ -103,6 +105,36 @@ def admin_logout():
     return "", 200
 
 
+@api.get("/admin/links")
+@login_required
+def admin_link_inspector():
+    """
+    Endpoint to inspect all links across all tables in the database.
+    It inspects the links
+    using the database engine and returns the results in JSON format.
+    Returns:
+        Response: A JSON response containing the inspection results.
+    """
+    res = inspect_links(db.engine)
+
+    return jsonify({"report": res})
+
+
+@api.post("/admin/sql")
+@login_required
+def admin_execute_sql():
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error": "No data was provided!"}), 400
+
+    query_res, query_ok = execute_select(data["query"], db.engine)
+
+    if query_ok != 200:
+        return jsonify({"err_msg": query_res}), query_ok
+    return jsonify({"res": query_res})
+
+
 @api.post("/newsletter/subscribe")
 def newsletter_subscribe():
     """
@@ -132,6 +164,106 @@ def newsletter_subscribe():
     return jsonify({"success": "email subscribed to newsletter!"})
 
 
+@api.delete("/newsletter/unsubscribe")
+def newsletter_unsubscribe():
+    """
+    Endpoint to handle newsletter unsubscription.
+    This endpoint allows a user to unsubscribe from the newsletter by providing a valid token.
+    The token is verified, and if valid, the corresponding email is removed from the newsletter list.
+    Returns:
+        JSON response indicating success or failure of the unsubscription process.
+    Responses:
+        200: {"success": "Email has been unsubscribed!"}
+        400: {"error": "No data received"}
+        400: {"expired": "Token is expired. Either request unsubscribing thru the unsubscribe link in
+              the newsletter or contact me to request to unsubscribe from the newsletter"}
+    Raises:
+        KeyError: If the token does not contain the expected data.
+    """
+    token = request.args.get("t")
+
+    if not token:
+        return jsonify({"error": "No data received"}), 400
+
+    data = verify_token(token)
+
+    if not data:
+        return (
+            jsonify(
+                {
+                    "expired": """Token is expired.
+                Either request unsubscribing thru the unsubscribe link in the newsletter
+                or contact me to request to unsubscribe from the newseltter"""
+                }
+            ),
+            400,
+        )
+
+    subscriber = db.session.execute(
+        db.select(NewsLetterList).filter_by(email=data["email"]).first()
+    ).scalar()
+
+    db.session.delete(subscriber)
+    db.session.commit()
+    return jsonify({"success": "Email has been unsubscribed!"})
+
+
+@api.get("/newsletter/getsubs")
+@login_required
+def newsletter_getsubs():
+    schema = NewsLetterSchema(many=True, exclude=("id",))
+    query_res = db.session.execute(db.select(NewsLetterList)).scalars()
+
+    res = schema.dump(query_res)
+
+    return jsonify({"res": [item["email"] for item in res]})
+
+
+@api.route("/newsletter/draft", methods=["GET", "POST", "DELETE"])
+@login_required
+def newsletter_draft():
+    match request.method:
+        case "GET":
+            schema = NewsLetterDraftContentSchema()
+            draft = db.session.execute(
+                db.select(NewsLetterDraftContent).filter_by(id=1)
+            ).scalar_one_or_none()
+
+            if not draft:
+                return "", 204
+            return schema.dump(draft)
+        case "POST":
+            data = request.get_json(silent=True)
+            current_draft = db.session.execute(
+                db.select(NewsLetterDraftContent).filter_by(id=1)
+            ).scalar_one_or_none()
+
+            if not current_draft:
+                draft = NewsLetterDraftContent(
+                    id=1,
+                    content=data["content"],
+                    title=data["title"],
+                )
+
+                db.session.add(draft)
+                db.session.commit()
+            else:
+                current_draft.content = data["content"]
+                current_draft.title = data["title"]
+
+                db.session.add(current_draft)
+                db.session.commit()
+            return "", 200
+        case "DELETE":
+            draft = db.session.execute(
+                db.select(NewsLetterDraftContent).filter_by(id=1)
+            ).scalar()
+
+            db.session.delete(draft)
+            db.session.commit()
+            return "", 200
+
+
 @api.post("/newsletter/send")
 @login_required
 def newsletter_send():
@@ -143,77 +275,53 @@ def newsletter_send():
     Raises:
         - 400: If no data was provided
     """
-    schema = NewsLetterSchema(many=True)
     data = request.get_json(silent=True)
 
     if not data:
         return jsonify({"error": "No data received"}), 400
 
-    result = db.session.execute(db.select(NewsLetterList).all()).all()
+    draft = db.session.execute(
+        db.select(NewsLetterDraftContent).filter_by(id=1)
+    ).scalar_one_or_none()
 
-    subscribers = schema.load(result)
+    if draft:
+        db.session.delete(draft)
+        db.session.commit()
+
+    result = db.session.execute(db.select(NewsLetterList)).fetchall()
+    subscribers: map[str] = map(lambda x: x[0].email, result)
 
     with mail.connect() as conn:
         for subscriber in subscribers:
-            body = data["body"]
-            quoted_email = quote(subscriber["email"])
+            body = data["content"]
+            token = generate_unsubscribe_token(subscriber)
 
             body_with_footer = (
-                body
+                "<div style='border: 3px dashed gray; border-radius: 1% 10%;'>"
+                + "<div style='padding: 2rem;'>"
+                + body
                 + f"""
-            <br /> <br />
-            <a href="http://localhost:5173/newsletter/unsubscribe?e={quoted_email}">
-                Unsubscribe from newsletter
-            </a>
-            """
+                        <br /> <br />
+                        <div style='border-top-width: 2px'>
+                            <a href="http://sleylanguren.com/newsletter/unsubscribe?t={token}">
+                                Unsubscribe from newsletter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                """
             )
 
             msg = Message(
                 sender=("Sergio Ley", current_app.config["MAIL_USERNAME"]),
-                recipients=[subscriber["email"]],
-                subject=data["subject"],
+                recipients=[subscriber],
+                subject=data["title"],
                 html=body_with_footer,
             )
 
             conn.send(msg)
 
     return jsonify({"success": "all messages successfully sent"})
-
-
-@api.post("/newsletter/unsubscribe")
-def newsletter_unsubscribe():
-    """
-    Unsubscribes the provided email from the newsletter list.
-
-    Returns:
-        A response with status code 200 if the email is successfully unsubscribed.
-
-    Raises:
-        400: If no data is received.
-        403: If the provided data is invalid.
-        404: If the email is not subscribed to the newsletter.
-    """
-    schema = NewsLetterSchema()
-    data = request.get_json(silent=True)
-
-    if not data:
-        return jsonify({"error": "No data received"}), 400
-
-    try:
-        validated_data = schema.load(data)
-    except ValidationError as err:
-        return jsonify({"errors": err.messages}), 403
-
-    email = db.session.execute(
-        db.select(NewsLetterList).filter_by(email=validated_data["email"])
-    ).scalar_one_or_none()
-
-    if not email:
-        return jsonify({"error": "Email is not subscribed to the newsletter"}), 404
-
-    db.session.delete(email)
-    db.session.commit()
-    return 200
 
 
 @api.post("/education/courses")
@@ -940,7 +1048,7 @@ def get_blogs():
 
 @api.get("/blog/singular")
 def get_blog():
-    blog_id = request.args.get("id", None, int)
+    blog_id = request.args.get("id", type=int)
     editing = request.args.get("edit")
 
     if editing == "true":
@@ -959,6 +1067,31 @@ def get_blog():
     blog_post = db.session.execute(db.select(BlogPost).filter_by(id=blog_id)).scalar()
 
     return schema.dump(blog_post)
+
+
+@api.get("/blog/drafts")
+@login_required
+def get_blog_drafts():
+    schema = BlogPostSchema(
+        many=True,
+        only=(
+            "id",
+            "title",
+            "created_at",
+            "desc",
+        ),
+    )
+
+    blogs = db.session.execute(
+        db.select(BlogPost)
+        .filter_by(is_draft=True)
+        .order_by(BlogPost.created_at.desc())
+    ).scalars()
+
+    if not blogs:
+        return "", 204
+
+    return schema.dump(blogs)
 
 
 @api.post("/blog/add")
@@ -1001,7 +1134,7 @@ def edit_blog():
     fields = request.form.get("fields")
     raw_fields = tuple(json.loads(fields))
     parsed_fields = tuple(
-        filter(lambda x: x not in ["has_image", "img_del", "content", "id"], raw_fields)
+        filter(lambda x: x not in ["has_image", "img_del", "id"], raw_fields)
     )
     schema = BlogPostSchema(only=parsed_fields) if parsed_fields else BlogPostSchema()
     data = {
@@ -1019,7 +1152,7 @@ def edit_blog():
         data["is_draft"] = is_draft == "true"
 
     current_blog = db.session.execute(
-        db.select(BlogPost).filter_by(id=data["id"])
+        db.select(BlogPost).filter_by(id=data.pop("id"))
     ).scalar()
 
     if content:
@@ -1033,26 +1166,17 @@ def edit_blog():
             if not res:
                 return "", 500
 
-    if not data.get("title", False):
-        data["title"] = current_blog.title
-
-    if not data.get("desc", False):
-        data["desc"] = current_blog.desc
-
     try:
         serialized_data = schema.load(data)
     except ValidationError as err:
-        print(err.messages)
         return jsonify({"errors": err.messages}), 403
 
     if schema.only:
         for field in schema.only:
-            serialized_data[field] = json.loads(content)
+            if field == "content":
+                current_blog.content = content
 
             setattr(current_blog, field, serialized_data[field])
-
-    if content:
-        current_blog.content = serialized_data["content"]
 
     db.session.commit()
     return jsonify({"success": "Blog has been successfully updated!"})

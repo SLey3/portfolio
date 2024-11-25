@@ -3,16 +3,13 @@ from typing import Optional
 import pendulum
 import sqlalchemy as sa
 from marshmallow import validate
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db, ma
 
 # get local tz
 local_tz = pendulum.local_timezone()
-
-# temp
-is_postgres = False
 
 
 # database models
@@ -50,6 +47,14 @@ class NewsLetterList(db.Model):
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
 
 
+class NewsLetterDraftContent(db.Model):
+    __tablename__ = "newsletter_draft"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
+
+
 class BlogPost(db.Model):
     """
     db model for blog post entries
@@ -70,10 +75,7 @@ class BlogPost(db.Model):
     created_at: Mapped[str] = mapped_column(
         default=pendulum.now(local_tz).format("LL LTS zz")
     )
-    if is_postgres:
-        content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
-    else:
-        content: Mapped[dict] = mapped_column(db.JSON(), unique=True, nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
     desc: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_draft: Mapped[bool] = mapped_column(nullable=False, default=False)
 
@@ -283,6 +285,11 @@ class NewsLetterSchema(ma.SQLAlchemyAutoSchema):
         model = NewsLetterList
 
     email = ma.auto_field(validate=[validate.Email()])
+
+
+class NewsLetterDraftContentSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = NewsLetterDraftContent
 
 
 class BlogPostSchema(ma.SQLAlchemyAutoSchema):

@@ -1,16 +1,22 @@
 import atexit
+import os
+import sys
+from pathlib import Path
+from threading import Thread
+from time import sleep
+
 from flask import Flask
 from flask_mail import Mail
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from schedule import clear as sched_clear
+from schedule import run_pending
 from sqlalchemy.pool import NullPool
 
 import config as cg
+from scheduler import register_jobs
 from utils.sql import showcase_has_data, SQLAlchemyBase
-import os
-import sys
-from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -26,6 +32,20 @@ migrate = Migrate()
 mail = Mail()
 
 
+# internal functions
+def _run_scheduler():
+    while True:
+        run_pending()
+        sleep(1)
+
+
+def _start_scheduler():
+    thread = Thread(target=_run_scheduler)
+    thread.daemon = True
+    thread.start()
+
+
+# create app
 def create_app(test=False, tmp_db_dir=None):
     app = Flask(__name__, instance_relative_config=True)
 
@@ -63,6 +83,15 @@ def create_app(test=False, tmp_db_dir=None):
 
     app.register_blueprint(api)
 
+    # register scheduler jobs
+    with app.app_context():
+        register_jobs(app)
+
+    # start job scheduler
+    _start_scheduler()
+
+    # atexit registrations
     if test:
         atexit.register(db.drop_all)
+    atexit.register(sched_clear)
     return app

@@ -141,12 +141,14 @@ const NavBar: React.FC = () => {
 						) : (
 							<>
 								<Navbar.Link
-									href="/admin/dashboard"
+									href="/admin/management"
 									active={
-										location.pathname === '/admin/dashboard'
+										location.pathname ===
+										'/admin/management'
 									}
 									disabled={
-										location.pathname === '/admin/dashboard'
+										location.pathname ===
+										'/admin/management'
 									}>
 									Administrator Dashboard
 								</Navbar.Link>

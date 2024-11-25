@@ -1,73 +1,73 @@
-import { Icons, iconVariants } from '@/components/icons';
-import {
-	MARK_BOLD,
-	MARK_CODE,
-	MARK_ITALIC,
-	MARK_STRIKETHROUGH,
-	MARK_UNDERLINE,
-} from '@udecode/plate-basic-marks';
-import { useEditorReadOnly } from '@udecode/plate-common';
-import { MARK_BG_COLOR, MARK_COLOR } from '@udecode/plate-font';
+import React from 'react';
 
+import {
+  BoldPlugin,
+  CodePlugin,
+  ItalicPlugin,
+  StrikethroughPlugin,
+  UnderlinePlugin,
+} from '@udecode/plate-basic-marks/react';
+import { useEditorReadOnly } from '@udecode/plate-common/react';
+
+import { Icons, iconVariants } from '@/components/icons';
+
+import { MarkToolbarButton } from './mark-toolbar-button';
+import { TurnIntoDropdownMenu } from './turn-into-dropdown-menu';
 import { ColorDropdownMenu } from './color-dropdown-menu';
 import { CommentToolbarButton } from './comment-toolbar-button';
-import { MarkToolbarButton } from './mark-toolbar-button';
 import { MoreDropdownMenu } from './more-dropdown-menu';
-import { TurnIntoDropdownMenu } from './turn-into-dropdown-menu';
+import { FontBackgroundColorPlugin, FontColorPlugin } from '@udecode/plate-font/react';
 
 export function FloatingToolbarButtons() {
-	const readOnly = useEditorReadOnly();
+  const readOnly = useEditorReadOnly();
 
-	return (
-		<>
-			{!readOnly && (
-				<>
-					<TurnIntoDropdownMenu />
+  return (
+    <>
+      {!readOnly && (
+        <>
+          <TurnIntoDropdownMenu />
 
-					<ColorDropdownMenu
-						nodeType={MARK_COLOR}
-						tooltip="Text Color">
-						<Icons.color
-							className={iconVariants({ variant: 'toolbar' })}
-						/>
-					</ColorDropdownMenu>
-					<ColorDropdownMenu
-						nodeType={MARK_BG_COLOR}
-						tooltip="Highlight Color">
-						<Icons.bg
-							className={iconVariants({ variant: 'toolbar' })}
-						/>
-					</ColorDropdownMenu>
-					<MarkToolbarButton
-						nodeType={MARK_BOLD}
-						tooltip="Bold (⌘+B)">
-						<Icons.bold />
-					</MarkToolbarButton>
-					<MarkToolbarButton
-						nodeType={MARK_ITALIC}
-						tooltip="Italic (⌘+I)">
-						<Icons.italic />
-					</MarkToolbarButton>
-					<MarkToolbarButton
-						nodeType={MARK_UNDERLINE}
-						tooltip="Underline (⌘+U)">
-						<Icons.underline />
-					</MarkToolbarButton>
-					<MarkToolbarButton
-						nodeType={MARK_STRIKETHROUGH}
-						tooltip="Strikethrough (⌘+⇧+M)">
-						<Icons.strikethrough />
-					</MarkToolbarButton>
-					<MarkToolbarButton
-						nodeType={MARK_CODE}
-						tooltip="Code (⌘+E)">
-						<Icons.code />
-					</MarkToolbarButton>
-					<CommentToolbarButton />
-				</>
-			)}
-
-			<MoreDropdownMenu />
-		</>
-	);
+          <ColorDropdownMenu
+            nodeType={FontColorPlugin.key}
+            tooltip="Text Color"
+          >
+            <Icons.color
+              className={iconVariants({ variant: 'toolbar' })}
+            />
+          </ColorDropdownMenu>
+          <ColorDropdownMenu
+            nodeType={FontBackgroundColorPlugin.key}
+            tooltip="Highlight Color"
+          >
+            <Icons.bg
+              className={iconVariants({ variant: 'toolbar' })}
+            />
+          </ColorDropdownMenu>
+          <MarkToolbarButton nodeType={BoldPlugin.key} tooltip="Bold (⌘+B)">
+            <Icons.bold />
+          </MarkToolbarButton>
+          <MarkToolbarButton nodeType={ItalicPlugin.key} tooltip="Italic (⌘+I)">
+            <Icons.italic />
+          </MarkToolbarButton>
+          <MarkToolbarButton
+            nodeType={UnderlinePlugin.key}
+            tooltip="Underline (⌘+U)"
+          >
+            <Icons.underline />
+          </MarkToolbarButton>
+          <MarkToolbarButton
+            nodeType={StrikethroughPlugin.key}
+            tooltip="Strikethrough (⌘+⇧+M)"
+          >
+            <Icons.strikethrough />
+          </MarkToolbarButton>
+          <MarkToolbarButton nodeType={CodePlugin.key} tooltip="Code (⌘+E)">
+            <Icons.code />
+          </MarkToolbarButton>
+          <CommentToolbarButton />
+        </>
+      )}
+      <MoreDropdownMenu />
+    </>
+  );
 }

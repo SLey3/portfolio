@@ -17,7 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Home: React.FC = () => {
 	const typewriter_words: string[] = [
-		'Full Stack Web Developer',
+		'Software Engineering',
 		'Frontend',
 		'Backend',
 		'SQL',
@@ -25,6 +25,7 @@ const Home: React.FC = () => {
 		'Typescript / Javascript',
 		'Python',
 		'Flask',
+		'Full Stack Web Development',
 	];
 
 	const { register, handleSubmit } = useForm<MainNewsLetterInput>();
@@ -89,7 +90,7 @@ const Home: React.FC = () => {
 						{/* prettier-ignore */}
 						<form
 							className="relative flex flex-col content-center justify-start w-full gap-6 md:right-10 lg:right-32 lg:translate-x-0 xl:right-36 xl:flex-row"
-							onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises -- reason being that this is the normal method to apply handleSubmit per react-hook-forms */}
+							onSubmit={handleSubmit(onSubmit)}> { }
 							<div>
 								<TextInput
 									className="lg:w-96"

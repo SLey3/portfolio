@@ -25,7 +25,7 @@ def login_user(username):
 
 def logout_user():
     """
-    Logs out the user by clearing the manager.
+    Logs out the user.
     """
     session.pop("token")
 
@@ -41,14 +41,10 @@ def login_required(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        token = request.headers.get("Authorization")
-
-        if not token or not session.get("token"):
+        if not request.headers.get("Authorization") or not session.get("token"):
             return "", 403
 
-        comparator: str = session["token"]
-
-        if token == comparator:
+        if request.headers["Authorization"] == session["token"]:
             return func(*args, **kwargs)
         else:
             return "", 403

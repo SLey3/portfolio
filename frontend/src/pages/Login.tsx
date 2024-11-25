@@ -62,8 +62,10 @@ const Login: React.FC = () => {
 					</div>
 					<div>
 						{/* prettier-ignore */}
-						{/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-						<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+						{}
+						<form
+							className="space-y-6"
+							onSubmit={handleSubmit(onSubmit)}>
 							<div>
 								<div className="mb-3 block">
 									<Label

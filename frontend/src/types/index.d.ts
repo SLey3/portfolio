@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Value } from '@udecode/plate-common';
+import type { TPlateEditor } from '@udecode/plate-common/react';
 import React from 'react';
 
 declare module '@/components/plate-ui/*';
@@ -69,7 +71,27 @@ declare global {
 		credential_url: string;
 	}
 
+	// admin
+	interface LinkResultsProps {
+		tablename: string;
+		item_id: number;
+		link: string;
+		validity: boolean | string;
+		http_code: number;
+	}
+
+	type ExecuteQueryResProps = {
+		[key: string]: [value: any];
+	};
+
+	interface DraftBlogList
+		extends Omit<Omit<Omit<BlogList, 'is_draft'>, 'content'>, 'author'> {}
+
 	// forms
+	interface NewsLetterCreateForm {
+		title: string;
+	}
+
 	interface LoginForm {
 		email: string;
 		password: string;
@@ -81,6 +103,10 @@ declare global {
 		contact_type: string;
 		msg_subject: string;
 		msg_body: string;
+	}
+
+	interface ExecuteQueryForm {
+		query: string;
 	}
 
 	interface CertLicenseAddProps extends CertLicenseProps {}
@@ -148,6 +174,10 @@ declare global {
 		icon?: React.ReactElement | null;
 	}
 
+	interface MediumCardProps extends CardProps {
+		longWidth?: boolean;
+	}
+
 	interface LargeCardProps extends CardProps {
 		center?: boolean;
 	}
@@ -181,8 +211,8 @@ declare global {
 
 	// editor
 	interface TextEditorProps {
-		setContent: React.Dispatch<React.SetStateAction<Value>>;
-		editValues?: Value;
+		editor: TPlateEditor;
+		footerText?: string;
 	}
 
 	// protected component
@@ -194,7 +224,7 @@ declare global {
 	// contents and blog viewer
 	interface BlogList {
 		author: string;
-		content: Value;
+		content: string;
 		created_at: string;
 		id: number;
 		desc: string;
@@ -203,11 +233,20 @@ declare global {
 	}
 
 	interface BlogViewerProps {
-		content: Value;
+		content: string;
 	}
 
 	// utils
 	type FormErrRes = {
 		errors: { [key: string]: string[] };
 	};
+
+	// axios error types
+	interface BaseReqError {
+		error?: string;
+	}
+
+	interface NewsLetterUnSubReqError extends BaseReqError {
+		expired?: string;
+	}
 }

@@ -7,6 +7,7 @@ import CourseEditForm from '@/components/forms/CourseEditForm';
 import EducationAddForm from '@/components/forms/EducationAddForm';
 import EducationEditForm from '@/components/forms/EducationEditForm';
 import Section from '@/components/section';
+import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button } from 'flowbite-react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -50,6 +51,7 @@ const Education: React.FC = () => {
 	});
 	const [cookies] = useCookies(['user']);
 	const navigate = useNavigate();
+	const BearerToken = useAuthToken();
 
 	useEffect(() => {
 		const allCourses: CourseProps[] = [];
@@ -114,7 +116,6 @@ const Education: React.FC = () => {
 	const handleEduDeleteClick = useCallback(
 		(e: React.MouseEvent, item_id: number) => {
 			e.preventDefault();
-			const BearerToken = localStorage.getItem('token');
 
 			axios
 				.delete('/api/education/institute/delete', {
@@ -138,7 +139,7 @@ const Education: React.FC = () => {
 					toast.error(res?.error);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	const handleCourseEditClick = (e: React.MouseEvent, item: CourseProps) => {
@@ -150,7 +151,6 @@ const Education: React.FC = () => {
 	const handleCourseDeleteClick = useCallback(
 		(e: React.MouseEvent, item_id: number) => {
 			e.preventDefault();
-			const BearerToken = localStorage.getItem('token');
 
 			axios
 				.delete('/api/education/courses/delete', {
@@ -173,7 +173,7 @@ const Education: React.FC = () => {
 					toast.error(res?.error);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	return (

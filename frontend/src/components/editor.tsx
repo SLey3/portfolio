@@ -5,21 +5,14 @@ import { FixedToolbarButtons } from '@/components/plate-ui/fixed-toolbar-buttons
 import { FloatingToolbar } from '@/components/plate-ui/floating-toolbar';
 import { FloatingToolbarButtons } from '@/components/plate-ui/floating-toolbar-buttons';
 import { TooltipProvider } from '@/components/plate-ui/tooltip';
-import plugins from '@/utils/plate/plugins';
-import { CommentsProvider } from '@udecode/plate-comments';
-import { Plate } from '@udecode/plate-common';
-import { Suspense } from 'react';
+import { CommentProvider } from '@udecode/plate-comments/react';
+import { Plate } from '@udecode/plate-common/react';
+import { Suspense, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-const TextEditor: React.FC<TextEditorProps> = ({ setContent, editValues }) => {
-	const initialValue = editValues || [
-		{
-			id: '1',
-			type: 'p',
-			children: [{ text: '' }],
-		},
-	];
+const TextEditor: React.FC<TextEditorProps> = ({ editor, footerText }) => {
+	const editorRef = useRef(null);
 
 	return (
 		<Suspense
@@ -30,35 +23,28 @@ const TextEditor: React.FC<TextEditorProps> = ({ setContent, editValues }) => {
 					</p>
 				</>
 			}>
-			<TooltipProvider>
-				<DndProvider backend={HTML5Backend}>
-					<CommentsProvider
-						users={{
-							1: {
-								id: '1',
-								name: 'Sergio Ley Languren',
-								avatarUrl:
-									'https://avatars.githubusercontent.com/u/44455382?v=4&size=64',
-							},
-						}}
-						myUserId="1">
-						<Plate
-							plugins={plugins}
-							onChange={(newVal) => setContent(newVal)}
-							initialValue={initialValue}>
+			<DndProvider backend={HTML5Backend}>
+				<TooltipProvider>
+					<CommentProvider>
+						<Plate editor={editor}>
 							<FixedToolbar>
 								<FixedToolbarButtons />
 							</FixedToolbar>
-							<Editor autoFocus variant="ghost" />
+							<Editor autoFocus ref={editorRef} variant="ghost" />
 
 							<FloatingToolbar>
 								<FloatingToolbarButtons />
 							</FloatingToolbar>
 							<CommentsPopover />
+							{footerText ? (
+								<p className="pl-2 pt-px font-poppins text-sm text-muted-foreground">
+									{footerText}
+								</p>
+							) : null}
 						</Plate>
-					</CommentsProvider>
-				</DndProvider>
-			</TooltipProvider>
+					</CommentProvider>
+				</TooltipProvider>
+			</DndProvider>
 		</Suspense>
 	);
 };
