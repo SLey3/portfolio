@@ -9,19 +9,19 @@ Functions:
 - delete_image: Deletes an image from the CDN.
 """
 
+import base64
 import os
 import uuid
 from io import BytesIO
-from typing import Any, Tuple, Union, Optional
+from typing import Any, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import requests
-import base64
 from dotenv import load_dotenv
-from werkzeug.datastructures import FileStorage
-from werkzeug.utils import secure_filename
 from imagekitio import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 
 __all__ = [
     "upload_image",
@@ -38,7 +38,7 @@ load_dotenv("..")
 PUBLIC_KEY = os.getenv("IMGKIT_PUBLIC_KEY")
 PRIVATE_KEY = os.getenv("IMGKIT_PRIVATE_KEY")
 IMGKIT_ID = os.getenv("IMGKIT_ID")
-URL_ENDPOINT = "https://ik.imagekit.io/{IMGKIT_ID}/"
+URL_ENDPOINT = f"https://ik.imagekit.io/{IMGKIT_ID}/"
 
 mime_to_extension = {
     "image/jpeg": "jpg",

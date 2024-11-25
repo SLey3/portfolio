@@ -1,9 +1,11 @@
-import { Icons } from '@/components/icons';
-import {
-	type EmojiDropdownMenuOptions,
-	useEmojiDropdownMenuState,
-} from '@udecode/plate-emoji';
 import React from 'react';
+
+import {
+  type EmojiDropdownMenuOptions,
+  useEmojiDropdownMenuState,
+} from '@udecode/plate-emoji/react';
+
+import { Icons } from '@/components/icons';
 
 import { emojiCategoryIcons, emojiSearchIcons } from './emoji-icons';
 import { EmojiPicker } from './emoji-picker';
@@ -11,39 +13,36 @@ import { EmojiToolbarDropdown } from './emoji-toolbar-dropdown';
 import { ToolbarButton } from './toolbar';
 
 type EmojiDropdownMenuProps = {
-	options?: EmojiDropdownMenuOptions;
+  options?: EmojiDropdownMenuOptions;
 } & React.ComponentPropsWithoutRef<typeof ToolbarButton>;
 
 export function EmojiDropdownMenu({
-	options,
-	...props
+  options,
+  ...props
 }: EmojiDropdownMenuProps) {
-	const { emojiPickerState, isOpen, setIsOpen } =
-		useEmojiDropdownMenuState(options);
+  const { emojiPickerState, isOpen, setIsOpen } =
+    useEmojiDropdownMenuState(options);
 
-	return (
-		<EmojiToolbarDropdown
-			control={
-				<ToolbarButton
-					isDropdown
-					pressed={isOpen}
-					tooltip="Emoji"
-					{...props}>
-					<Icons.emoji />
-				</ToolbarButton>
-			}
-			isOpen={isOpen}
-			setIsOpen={setIsOpen}>
-			<EmojiPicker
-				{...emojiPickerState}
-				icons={{
-					categories: emojiCategoryIcons,
-					search: emojiSearchIcons,
-				}}
-				isOpen={isOpen}
-				setIsOpen={setIsOpen}
-				settings={options?.settings}
-			/>
-		</EmojiToolbarDropdown>
-	);
+  return (
+    <EmojiToolbarDropdown
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      control={
+        <ToolbarButton isDropdown pressed={isOpen} tooltip="Emoji" {...props}>
+          <Icons.emoji className="size-4" />
+        </ToolbarButton>
+      }
+    >
+      <EmojiPicker
+        {...emojiPickerState}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        settings={options?.settings}
+        icons={{
+          categories: emojiCategoryIcons,
+          search: emojiSearchIcons,
+        }}
+      />
+    </EmojiToolbarDropdown>
+  );
 }

@@ -130,7 +130,7 @@ const CertLicenseEditForm: React.FC<EditFormProps<CertLicenseProps>> = ({
 							{/* prettier-ignore */}
 							<form
                                 className="mx-5 space-y-4"
-                                onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
+                                onSubmit={handleSubmit(onSubmit)}> { }
                                 <div>
 									<div className="mb-3 block">
 										<Label

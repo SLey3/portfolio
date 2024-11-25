@@ -125,7 +125,7 @@ const CourseEditForm: React.FC<EditFormProps<CourseProps>> = ({
 							{/* prettier-ignore */}
 							<form
 								className="mx-5 space-y-4"
-								onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
+								onSubmit={handleSubmit(onSubmit)}> { }
 								<div>
 									<div className="mb-3 block">
 										<Label

@@ -1,6 +1,7 @@
 import WebFooter from '@/components/Footer';
 import NavBar from '@/components/NavBar';
 import BlogViewer from '@/components/render-blog';
+import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -14,6 +15,7 @@ const ViewBlog: React.FC = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const [cookies] = useCookies(['user']);
+	const BearerToken = useAuthToken();
 
 	useEffect(() => {
 		axios
@@ -51,8 +53,6 @@ const ViewBlog: React.FC = () => {
 
 	const handleBlogDelete = useCallback(
 		(blogId: number) => {
-			const BearerToken = localStorage.getItem('token');
-
 			axios
 				.delete('/api/blog/delete', {
 					data: {
@@ -77,7 +77,7 @@ const ViewBlog: React.FC = () => {
 					console.error(err.response?.data);
 				});
 		},
-		[navigate]
+		[navigate, BearerToken]
 	);
 
 	return (

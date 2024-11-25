@@ -1,6 +1,20 @@
 import { HR } from 'flowbite-react';
 import React from 'react';
 
+/**
+ * A React functional component that renders a section with various layout and styling options.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string} props.header - The header text to display at the top of the section.
+ * @param {boolean} [props.col=false] - Determines if the section should use a column layout.
+ * @param {boolean} [props.col_row_reverse=false] - Determines if the section should reverse the row or column layout.
+ * @param {boolean} [props.ltr=true] - Determines if the text should be left-to-right. If false, text will be right-to-left.
+ * @param {boolean} [props.center=false] - Determines if the content should be centered.
+ * @param {boolean} [props.with_hr=false] - Determines if a horizontal rule should be displayed before and after the section.
+ * @param {React.ReactNode} props.children - The content to be displayed within the section.
+ *
+ * @returns {JSX.Element} The rendered section component.
+ */
 const Section: React.FC<SectionProps> = ({
 	header,
 	col = false,

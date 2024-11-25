@@ -14,7 +14,7 @@ group_by_package = true
 virtual_env = "pipenv"
 honor_noqa = true
 color_output = true
-skip_glob = ["__pycache__/*", "instance/*", "*.pyc"]
+skip_glob = ["__pycache__/*", "instance/*", "*.pyc", "migrations/*"]
 
 [tool.black]
 target-version = ["py311"]

@@ -73,7 +73,7 @@ const WebFooter: React.FC = () => {
 							</Footer.LinkGroup>
 						</div>
 						<div className="col-span-1 md:col-span-4">
-							{/* eslint-disable-next-line @typescript-eslint/no-misused-promises -- reason being that this is the normal method to apply handleSubmit per react-hook-forms */}
+							{}
 							<form onSubmit={handleSubmit(onSubmit)}>
 								<div className="flex flex-col items-center gap-y-4">
 									<div className="flex flex-row items-center justify-center gap-x-3">

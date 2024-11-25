@@ -3,7 +3,7 @@ repos:
     rev: v7.32.0
     hooks:
       - id: eslint
-        args: [-c, './frontend/.eslintrc.cjs', --fix, './frontend']
+        args: [-c, './frontend/eslint.config.js', --fix, './frontend']
         files: '\\.(js|.jsx|.ts|.tsx)$'
         exclude: ^node_modules/, ^backend/
         additional_dependencies:
@@ -11,7 +11,7 @@ repos:
           - eslint-plugin-react-hooks
           - eslint-plugin-react-refresh
           - eslint-plugin-tailwindcss
-          - '@typescript-eslint/eslint-plugin'
+          - 'typescript-eslint'
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 24.8.0
     hooks:
@@ -34,12 +34,3 @@ repos:
   #     - id: pytest
   #       language_version: python3
   #       exclude: ^frontend
-  - repo: local
-    hooks:
-      - id: run-prettier
-        name: Run Prettier Formatter
-        entry: cd frontend && npx prettier --write .
-        language: script
-        pass_filenames: false
-        files: '\\.(js|jsx|ts|tsx)$'
-        exclude: ^frontend/node_modules/, ^backend/

@@ -1,5 +1,5 @@
 """
-Backend Configuration for the app instanse of the portfolio website
+Backend Configuration for the app instance of the portfolio website
 Includes:
 Development Config
 Testing Config
@@ -21,17 +21,18 @@ class BaseConfig:
     SECRET_KEY = os.getenv("SECRET_KEY")
     DEBUG = True
     SQLALCHEMY_ECHO = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_DEBUG = True
     MAIL_USERNAME = os.getenv("MAIL_USERNAME")
     MAIL_PASSWORD = os.getenv("MAIL_PWD")
 
 
 class DevConfig(BaseConfig):
     DEVELOPMENT = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    MAIL_DEBUG = True
+
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
         basedir, "instance", "database.sql"
     )
@@ -39,12 +40,12 @@ class DevConfig(BaseConfig):
 
 class TestConfig(BaseConfig):
     TESTING = True
+    DEBUG = False
 
     SQLALCHEMY_ECHO = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProdConfig(BaseConfig):
     DEBUG = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_PROD_DATABASE_URI")
-    MAIL_DEBUG = False

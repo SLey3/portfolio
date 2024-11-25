@@ -54,7 +54,7 @@ const Contact: React.FC = () => {
 				{/* prettier-ignore */}
 				<form
 					className="space-y-4 pl-10 text-black"
-					onSubmit={handleSubmit(onSubmit)}> {/* eslint-disable-line @typescript-eslint/no-misused-promises */}
+					onSubmit={handleSubmit(onSubmit)}> { }
 					<div>
 						<div className="mb-3 block">
 							<Label

@@ -1,6 +1,16 @@
 import React from 'react';
 
 // cards (sm, md, lg)
+/**
+ * A small card component that displays a title and an optional icon.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string} props.title - The title to be displayed on the card.
+ * @param {boolean} [props.bg_transparent=false] - Determines if the background should be transparent.
+ * @param {React.ReactNode} [props.icon=null] - An optional icon to be displayed on the card.
+ *
+ * @returns {JSX.Element} The rendered small card component.
+ */
 export const SmallCard: React.FC<SmallCardProps> = ({
 	title,
 	bg_transparent = false,
@@ -28,18 +38,33 @@ export const SmallCard: React.FC<SmallCardProps> = ({
 	);
 };
 
-export const MediumCard: React.FC<CardProps> = ({
+/**
+ * A React functional component that renders a medium-sized card with customizable background,
+ * width, title, and children content.
+ *
+ * @param {MediumCardProps} props - The properties object.
+ * @param {string} props.title - The title to be displayed on the card.
+ * @param {boolean} [props.bg_transparent=false] - Determines if the card background should be transparent.
+ * @param {boolean} [props.longWidth=false] - Determines if the card should have a longer width.
+ * @param {React.ReactNode} props.children - The content to be displayed inside the card.
+ *
+ * @returns {JSX.Element} The rendered medium card component.
+ */
+export const MediumCard: React.FC<MediumCardProps> = ({
 	title,
 	bg_transparent = false,
+	longWidth = false,
 	children,
 }) => {
 	const bg = bg_transparent
 		? 'bg-transparent border-white'
 		: 'bg-slate-100/5 border-black/10';
+
+	const width = longWidth ? 'lg:w-[45vw]' : 'lg:w-96';
 	return (
 		<>
 			<div
-				className={`rounded-xl border shadow-lg shadow-slate-800 ${bg} m-3 size-auto overflow-x-hidden overflow-y-scroll p-3 hover:border-x-4 hover:border-b-8 hover:border-slate-800 hover:shadow-2xl hover:shadow-black md:h-[35rem] lg:w-96`}>
+				className={`rounded-xl border shadow-lg shadow-slate-800 ${bg} m-3 size-auto overflow-x-hidden overflow-y-scroll p-3 hover:border-x-4 hover:border-b-8 hover:border-slate-800 hover:shadow-2xl hover:shadow-black md:h-[35rem] ${width}`}>
 				<div className="flex flex-col content-center items-center justify-center gap-y-2">
 					{title ? (
 						<div>
@@ -57,6 +82,17 @@ export const MediumCard: React.FC<CardProps> = ({
 	);
 };
 
+/**
+ * A large card component that displays a title and children content.
+ *
+ * @param {LargeCardProps} props - The properties for the LargeCard component.
+ * @param {string} props.title - The title to display at the top of the card.
+ * @param {boolean} [props.bg_transparent=false] - Whether the background should be transparent.
+ * @param {boolean} [props.center=true] - Whether the content should be centered.
+ * @param {React.ReactNode} props.children - The content to display inside the card.
+ *
+ * @returns {JSX.Element} The rendered LargeCard component.
+ */
 export const LargeCard: React.FC<LargeCardProps> = ({
 	title,
 	bg_transparent = false,
