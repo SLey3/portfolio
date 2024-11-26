@@ -1,5 +1,4 @@
-import React from 'react';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
