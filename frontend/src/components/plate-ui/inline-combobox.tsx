@@ -196,7 +196,7 @@ const InlineCombobox = ({
       <ComboboxProvider
         store={store}
         open={
-          (items.length > 0 || hasEmpty) ? !hideWhenNoValue || value.length > 0 : null
+          (items.length > 0 || hasEmpty) ? !hideWhenNoValue || value.length > 0 : undefined
         }
       >
         <InlineComboboxContext.Provider value={contextValue}>
