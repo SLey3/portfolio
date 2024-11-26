@@ -8,7 +8,7 @@ from typing import Any, List
 import requests
 from sqlalchemy import func, inspect, select, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import DeclarativeBase, Session
 
 __all__ = [
@@ -135,7 +135,7 @@ def execute_select(query: str, engine: Engine) -> tuple[Any, int]:
             res = session.execute(text(f"SELECT {query}")).fetchall()
             rows = [tuple(row) for row in res]
             table = query.split("FROM")[1].split("WHERE")[0].strip()
-        except OperationalError as sqlerr:
+        except DatabaseError as sqlerr:
             err_msg = sqlerr._message()
             return (
                 err_msg,
