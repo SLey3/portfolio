@@ -21,8 +21,6 @@ export default tseslint.config(
 			'tailwind.config.ts',
 			'postcss.config.js',
 			'src/vite-env.d.ts',
-			'src/components/plate-ui/*',
-			'src/components/icons.tsx',
 		],
 	},
 	{
@@ -47,6 +45,8 @@ export default tseslint.config(
 			'react/no-array-index-key': 'error',
 			eqeqeq: ['error', 'always'],
 			'react/prop-types': 'off',
+			'react/display-name': 'off',
+			'react/no-unknown-property': 'off',
 			'typescript-eslint/no-unsafe-member-access': 'off',
 			'typescript-eslint/no-unsafe-argument': 'off',
 			'typescript-eslint/no-unsafe-call': 'off',

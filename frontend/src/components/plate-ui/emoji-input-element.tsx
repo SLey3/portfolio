@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { withRef } from '@udecode/cn';
 import { EmojiInlineIndexSearch, insertEmoji } from '@udecode/plate-emoji';
@@ -15,7 +15,7 @@ import {
 import { PlateElement } from './plate-element';
 
 export const EmojiInputElement = withRef<typeof PlateElement>(
-  ({ className, ...props }, ref) => {
+  ({...props }, ref) => {
     const { children, editor, element } = props;
     const [value, setValue] = useState('');
     const debouncedValue = useDebounce(value, 100);

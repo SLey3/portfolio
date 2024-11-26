@@ -1,7 +1,3 @@
-'use client';
-
-import React from 'react';
-
 import type { TCommentText } from '@udecode/plate-comments';
 
 import { cn } from '@udecode/cn';

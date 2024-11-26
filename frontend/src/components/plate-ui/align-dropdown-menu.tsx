@@ -36,7 +36,7 @@ const items = [
   },
 ];
 
-export function AlignDropdownMenu({ children, ...props }: DropdownMenuProps) {
+export function AlignDropdownMenu({ ...props }: DropdownMenuProps) {
   const state = useAlignDropdownMenuState();
   const { radioGroupProps } = useAlignDropdownMenu(state);
 

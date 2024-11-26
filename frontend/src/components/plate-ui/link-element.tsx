@@ -1,5 +1,4 @@
-import React from 'react';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TLinkElement } from '@udecode/plate-link';
 
 import { cn, withRef } from '@udecode/cn';

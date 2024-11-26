@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/no-array-index-key */
 
 import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import type { TTableElement } from '@udecode/plate-table';

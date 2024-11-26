@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { withRef, withVariants } from '@udecode/cn';
 import { cva } from 'class-variance-authority';
 
@@ -34,7 +32,7 @@ const HeadingElementVariants = withVariants(
 );
 
 export const HeadingElement = withRef<typeof HeadingElementVariants>(
-  ({ children, isFirstBlock, variant = 'h1', ...props }, ref) => {
+  ({ children, variant = 'h1', ...props }, ref) => {
     const { editor, element } = props;
 
     return (
