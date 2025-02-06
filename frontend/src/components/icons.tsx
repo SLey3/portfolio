@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority';
-import { Columns3, Edit2, LucideProps } from 'lucide-react';
+import { Edit2, LucideProps } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
 	LuAlignCenter,
@@ -12,8 +12,9 @@ import {
 	LuChevronDown,
 	LuChevronRight,
 	LuChevronsUpDown,
-	LuCode2,
-	LuColumns,
+	LuCode,
+	LuColumns2,
+	LuColumns3,
 	LuCombine,
 	LuExternalLink,
 	LuEye,
@@ -27,7 +28,6 @@ import {
 	LuHeading5,
 	LuHeading6,
 	LuImage,
-	LuIndent,
 	LuItalic,
 	LuKeyboard,
 	LuLink2,
@@ -38,8 +38,6 @@ import {
 	LuMessageSquarePlus,
 	LuMinus,
 	LuMoon,
-	LuMoreHorizontal,
-	LuOutdent,
 	LuPaintBucket,
 	LuPaintbrush,
 	LuPilcrow,
@@ -64,6 +62,8 @@ import {
 	LuWrapText,
 	LuX,
 } from 'react-icons/lu';
+import { MdMoreHoriz } from "react-icons/md";
+import { FaIndent, FaOutdent } from "react-icons/fa6";
 
 export type Icon = LucideIcon;
 
@@ -221,7 +221,7 @@ export const Icons = {
 	chevronsUpDown: LuChevronsUpDown,
 	clear: LuX,
 	close: LuX,
-	code: LuCode2,
+	code: LuCode,
 	codeblock: LuFileCode,
 	color: LuBaseline,
 	column: LuRectangleVertical,
@@ -241,15 +241,15 @@ export const Icons = {
 	h5: LuHeading5,
 	h6: LuHeading6,
 	image: LuImage,
-	indent: LuIndent,
+	indent: FaIndent,
 	italic: LuItalic,
 	kbd: LuKeyboard,
 	lineHeight: LuWrapText,
 	link: LuLink2,
 	minus: LuMinus,
-	more: LuMoreHorizontal,
+	more: MdMoreHoriz,
 	ol: LuListOrdered,
-	outdent: LuOutdent,
+	outdent: FaOutdent,
 	paragraph: LuPilcrow,
 	refresh: LuRotateCcw,
 	row: LuRectangleHorizontal,
@@ -265,8 +265,8 @@ export const Icons = {
 	underline: LuUnderline,
 	unlink: LuLink2Off,
 	viewing: LuEye,
-	doubleColumn: LuColumns,
-	threeColumn: Columns3,
+	doubleColumn: LuColumns2,
+	threeColumn: LuColumns3,
 	rightSideDoubleColumn: rightSideDoubleColumn,
 	leftSideDoubleColumn: leftSideDoubleColumn,
 	doubleSideDoubleColumn: doubleSideDoubleColumn,
