@@ -4,8 +4,10 @@ import react_hooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import reactPlugin from 'eslint-plugin-react';
 import tailwindcss from 'eslint-plugin-tailwindcss';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default tseslint.config(
+	eslintConfigPrettier,
 	js.configs.recommended,
 	tseslint.configs.recommended,
 	reactPlugin.configs.flat.recommended,

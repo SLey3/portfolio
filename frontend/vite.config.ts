@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -7,6 +8,7 @@ export default defineConfig({
   build: {
     manifest: true,
     chunkSizeWarningLimit: 1000,
+    sourcemap: true
   },
   server: {
     open: true,
@@ -19,7 +21,10 @@ export default defineConfig({
       }
     },
   },
-  plugins: [react()],
+  plugins: [react(), sentryVitePlugin({
+    org: "sergio-ley",
+    project: "portfolio-website"
+  })],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
