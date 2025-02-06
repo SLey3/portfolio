@@ -47,6 +47,12 @@ const EditBlog: React.FC = () => {
 				},
 			})
 			.then((res: AxiosResponse) => {
+				if (!res.data.content) {
+					toast.warn("For some reason, the content did not load as it should");
+					console.log(res.data.content);
+					return;
+				}
+				
 				setBlogInfo(res.data);
 				editor.children = JSON.parse(res.data.content);
 				toast.info('blog data loaded!', {
