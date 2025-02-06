@@ -1,4 +1,5 @@
 import AboutMe from '@/pages/About';
+import TestSentry from './test';
 import AdminDashboard from '@/pages/AdminDashboard';
 import BlogPosts from '@/pages/Blogs';
 import BlogAdd from '@/pages/BlogsAdd';
@@ -22,6 +23,7 @@ function App() {
 			<Router future={{ v7_startTransition: true }}>
 				<Routes>
 					<Route Component={Home} path="/" />
+					<Route Component={TestSentry} path="/test" />
 					<Route Component={Education} path="/education" />
 					<Route Component={Experience} path="/experience" />
 					<Route Component={Showcase} path="/showcase" />
