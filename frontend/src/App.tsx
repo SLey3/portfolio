@@ -1,5 +1,4 @@
 import AboutMe from '@/pages/About';
-import TestSentry from './test';
 import AdminDashboard from '@/pages/AdminDashboard';
 import BlogPosts from '@/pages/Blogs';
 import BlogAdd from '@/pages/BlogsAdd';
@@ -16,14 +15,16 @@ import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
 import Http404 from '@/pages/http/404';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { withSentryReactRouterV6Routing } from '@sentry/react';
 
 function App() {
+	const SentryRoutes = withSentryReactRouterV6Routing(Routes);
+	
 	return (
 		<>
 			<Router future={{ v7_startTransition: true }}>
-				<Routes>
+				<SentryRoutes>
 					<Route Component={Home} path="/" />
-					<Route Component={TestSentry} path="/test" />
 					<Route Component={Education} path="/education" />
 					<Route Component={Experience} path="/experience" />
 					<Route Component={Showcase} path="/showcase" />
@@ -48,7 +49,7 @@ function App() {
 						path="/newsletter/unsubscribe"
 					/>
 					<Route Component={Http404} path="/*" />
-				</Routes>
+				</SentryRoutes>
 			</Router>
 		</>
 	);
