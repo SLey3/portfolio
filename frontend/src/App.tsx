@@ -15,7 +15,7 @@ import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
 import Http404 from '@/pages/http/404';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { withSentryReactRouterV6Routing } from '@sentry/react';
+import { withSentryReactRouterV6Routing, withProfiler } from '@sentry/react';
 
 function App() {
 	const SentryRoutes = withSentryReactRouterV6Routing(Routes);
@@ -55,4 +55,4 @@ function App() {
 	);
 }
 
-export default App;
+export default withProfiler(App);
