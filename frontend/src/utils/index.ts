@@ -49,3 +49,13 @@ export function getAdminLinkHighlightColor(status_code: number): string {
 			return 'bg-violet-500/30 text-violet-900';
 	}
 }
+
+
+export const serializeEditorContent = (content: any) => {
+	try {
+		return typeof content === 'string' ? content : JSON.stringify(content).trim();
+	} catch (error) {
+		console.error('Error serializing editor content:', error);
+		return '';
+	}
+};
