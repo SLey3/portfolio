@@ -3,7 +3,6 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import { SetFormErrors } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTextEditor } from '@/utils/plate/editor';
 import axios, { AxiosError } from 'axios';
@@ -18,9 +17,9 @@ import {
 } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { formatEditorContent, serializeEditorContent } from '../utils/editorUtils';
-import { getErrorMessage } from '../utils/errorUtils';
-import { APIErrorResponse, BlogApiResponse } from '../types/api';
+import { formatEditorContent, serializeEditorContent } from '@/utils/editorUtils';
+import { getErrorMessage } from '@/utils/errorUtils';
+import { APIErrorResponse, BlogApiResponse } from '@/types/api';
 
 const EditBlog: React.FC = () => {
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -29,7 +28,6 @@ const EditBlog: React.FC = () => {
 		register,
 		formState: { errors },
 		handleSubmit,
-		setError,
 		control,
 	} = useForm<BlogEditProps>();
 	const { blogId } = useParams();
@@ -44,25 +42,21 @@ const EditBlog: React.FC = () => {
 		axios.get<BlogApiResponse>(`/api/blog/singular?id=${blogId}&edit=true`, {
 			headers: { Authorization: BearerToken }
 		})
-			.then((response) => {
-				const formattedContent = formatEditorContent(response.data.content);
+			.then((res) => {
+				setBlogInfo(res.data);
+				const formattedContent = formatEditorContent(res.data.content);
 				editor.children = formattedContent;
-				toast.success('Blog loaded successfully', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 3000
-				});
+				toast.success('Blog loaded successfully');
 			})
 			.catch((err: AxiosError<APIErrorResponse>) => {
 				const errorMsg = getErrorMessage(err);
-				toast.error(errorMsg, {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 5000
-				});
+				toast.error(errorMsg);
 				console.error('Error loading blog:', err.response?.data || err);
 			});
 	}, [editor, BearerToken, blogId]);
 
 	const onSubmit: SubmitHandler<BlogEditProps> = (data) => {
+		setIsProcessing(true);
 		try {
 			const formattedContent = serializeEditorContent(editor.children);
 			
@@ -75,24 +69,18 @@ const EditBlog: React.FC = () => {
 				headers: { Authorization: BearerToken },
 			})
 				.then((response) => {
-					toast.success('Blog updated successfully', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 3000
-					});
+					toast.success('Blog updated successfully');
+					setIsProcessing(false);
+					navigate('/blog');
 				})
 				.catch((err: AxiosError<APIErrorResponse>) => {
 					const errorMsg = getErrorMessage(err);
-					toast.error(errorMsg, {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 5000
-					});
+					toast.error(errorMsg);
 					console.error('Error updating blog:', err.response?.data || err);
+					setIsProcessing(false);
 				});
 		} catch (error) {
-			toast.error('Failed to prepare blog content for submission', {
-				position: toast.POSITION.TOP_RIGHT,
-				autoClose: 5000
-			});
+			toast.error('Failed to prepare blog content for submission');
 			console.error('Error preparing blog content:', error);
 		}
 	};
