@@ -71,7 +71,12 @@ const EditBlog: React.FC = () => {
 				.then((response) => {
 					toast.success('Blog updated successfully');
 					setIsProcessing(false);
-					navigate('/blog');
+
+					setTimeout(() => {
+						return searchParams.get('f_a') === 'true'
+							? navigate('/admin/management')
+							: navigate(`/blog/view?id=${blogInfo?.id}`);
+					}, 5500);
 				})
 				.catch((err: AxiosError<APIErrorResponse>) => {
 					const errorMsg = getErrorMessage(err);
