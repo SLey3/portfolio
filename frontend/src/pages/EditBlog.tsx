@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import { SetFormErrors } from '@/utils';
+import { SetFormErrors, serializeEditorContent } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTextEditor } from '@/utils/plate/editor';
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
@@ -54,7 +54,7 @@ const EditBlog: React.FC = () => {
 				}
 				
 				setBlogInfo(res.data);
-				editor.children = JSON.parse(res.data.content);
+				editor.children = res.data.content
 				toast.info('blog data loaded!', {
 					closeButton: false,
 					closeOnClick: false,
@@ -76,7 +76,7 @@ const EditBlog: React.FC = () => {
 
 		setIsProcessing(true);
 		const formdata = new FormData();
-		const mod_content = JSON.stringify(editor.children).trim();
+		const mod_content = serializeEditorContent(editor.children);
 		const cur_content = JSON.stringify(blogInfo?.content).trim();
 		const fields = ['id'];
 
