@@ -3,7 +3,11 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import { SetFormErrors, serializeEditorContent } from '@/utils';
+import {
+	SetFormErrors,
+	formatEditorContent,
+	serializeEditorContent,
+} from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTextEditor } from '@/utils/plate/editor';
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
@@ -48,13 +52,17 @@ const EditBlog: React.FC = () => {
 			})
 			.then((res: AxiosResponse) => {
 				if (!res.data.content) {
-					toast.warn("For some reason, the content did not load as it should");
+					toast.warn(
+						'For some reason, the content did not load as it should'
+					);
 					console.log(res.data.content);
 					return;
 				}
-				
+
 				setBlogInfo(res.data);
-				editor.children = res.data.content
+
+				editor.children = formatEditorContent(res.data.content);
+
 				toast.info('blog data loaded!', {
 					closeButton: false,
 					closeOnClick: false,
