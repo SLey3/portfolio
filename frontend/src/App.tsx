@@ -14,12 +14,12 @@ import Projects from '@/pages/Projects';
 import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
 import Http404 from '@/pages/http/404';
+import { withProfiler, withSentryReactRouterV6Routing } from '@sentry/react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { withSentryReactRouterV6Routing, withProfiler } from '@sentry/react';
 
-function App() {
+export function App() {
 	const SentryRoutes = withSentryReactRouterV6Routing(Routes);
-	
+
 	return (
 		<>
 			<Router future={{ v7_startTransition: true }}>
@@ -55,4 +55,5 @@ function App() {
 	);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default withProfiler(App);

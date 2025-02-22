@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority';
 import { Edit2, LucideProps } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { FaIndent, FaOutdent } from 'react-icons/fa6';
 import {
 	LuAlignCenter,
 	LuAlignJustify,
@@ -62,8 +63,7 @@ import {
 	LuWrapText,
 	LuX,
 } from 'react-icons/lu';
-import { MdMoreHoriz } from "react-icons/md";
-import { FaIndent, FaOutdent } from "react-icons/fa6";
+import { MdMoreHoriz } from 'react-icons/md';
 
 export type Icon = LucideIcon;
 

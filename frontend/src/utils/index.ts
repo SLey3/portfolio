@@ -50,10 +50,28 @@ export function getAdminLinkHighlightColor(status_code: number): string {
 	}
 }
 
+/**
+ * Formats the editor content by parsing it if it's a string.
+ *
+ * @param content - The content to be formatted, which can be either an object or a string.
+ * @returns The formatted content as an object.
+ * @throws Will throw an error if the content is a string and cannot be parsed as JSON.
+ */
+export const formatEditorContent = (content: object | string) => {
+	return typeof content === 'object' ? content : JSON.parse(content);
+};
 
-export const serializeEditorContent = (content: any) => {
+/**
+ * Serializes the given editor content into a JSON string.
+ *
+ * @param content - The editor content to serialize. It can be an object or a string.
+ * @returns The serialized content as a JSON string. If an error occurs during serialization, an empty string is returned.
+ */
+export const serializeEditorContent = (content: object) => {
 	try {
-		return typeof content === 'string' ? content : JSON.stringify(content).trim();
+		return typeof content === 'string'
+			? content
+			: JSON.stringify(content).trim();
 	} catch (error) {
 		console.error('Error serializing editor content:', error);
 		return '';

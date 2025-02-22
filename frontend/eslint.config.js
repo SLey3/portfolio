@@ -23,6 +23,7 @@ export default tseslint.config(
 			'tailwind.config.ts',
 			'postcss.config.js',
 			'src/vite-env.d.ts',
+			'src/components/plate-ui',
 		],
 	},
 	{
