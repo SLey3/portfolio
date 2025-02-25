@@ -32,6 +32,7 @@ const EditBlog: React.FC = () => {
 		handleSubmit,
 		setError,
 		control,
+		getValues
 	} = useForm<BlogEditProps>();
 	const { blogId } = useParams();
 	const [searchParams] = useSearchParams();
@@ -96,7 +97,7 @@ const EditBlog: React.FC = () => {
 			formdata.append('desc', data.desc);
 		}
 
-		if (data.is_draft !== blogInfo?.is_draft && data.is_draft) {
+		if (data.is_draft !== blogInfo?.is_draft) {
 			formdata.append('is_draft', `${data.is_draft}`);
 		}
 
@@ -224,13 +225,13 @@ const EditBlog: React.FC = () => {
 					{blogInfo ? (
 						<TextEditor
 							editor={editor}
-							footerText={`editing blog: ${blogInfo.title}`}
+							footerText={getValues("title") ? `editing blog: ${getValues("title")}` : `editing blog: ${blogInfo.title}`}
 						/>
 					) : null}
 					<div className="px-3 py-5">
 						<Controller
 							control={control}
-							defaultValue={blogInfo?.is_draft ? false : true}
+							defaultValue={blogInfo?.is_draft}
 							name="is_draft"
 							render={({ field: { onChange, value } }) => (
 								<Checkbox
