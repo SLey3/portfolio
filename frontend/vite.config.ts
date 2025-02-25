@@ -7,7 +7,7 @@ import path from 'path';
 export default defineConfig({
   build: {
     manifest: true,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 5000,
     sourcemap: true
   },
   server: {
