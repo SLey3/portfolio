@@ -75,7 +75,7 @@ class BlogPost(db.Model):
     created_at: Mapped[str] = mapped_column(
         default=pendulum.now(local_tz).format("LL LTS zz")
     )
-    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
+    content: Mapped[str] = mapped_column(unique=True, nullable=False)
     desc: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_draft: Mapped[bool] = mapped_column(nullable=False, default=False)
 
@@ -266,7 +266,11 @@ class Showcase(db.Model):
 # db Table
 project_showcase = db.Table(
     "project_showcase",
-    sa.Column("project_id", sa.ForeignKey(ProjectPost.id), primary_key=True),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey(ProjectPost.id, ondelete="CASCADE"),
+        primary_key=True,
+    ),
     sa.Column("showcase_id", sa.ForeignKey(Showcase.id), primary_key=True),
 )
 
@@ -309,8 +313,9 @@ class EducationSchema(ma.SQLAlchemyAutoSchema):
                     "College",
                     "High School",
                     "Community College",
+                    "Graduate School",
                 ],
-                error='"{input}" is not a valid institution type',
+                error='"{input}" is not a valid institution type.',
             )
         ]
     )
