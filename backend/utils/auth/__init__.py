@@ -7,10 +7,11 @@ Functions:
 - login_required: Decorator to require login for a function.
 """
 
-from .manager import login_required, login_user, logout_user
+from .manager import login_required, login_user, logout_user, verify_auth
 
 __all__ = [
     "login_user",
     "logout_user",
     "login_required",
+    "verify_auth",
 ]

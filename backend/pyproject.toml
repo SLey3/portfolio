@@ -1,10 +1,10 @@
-# [tool.pytest.ini_options]
-# minversion = "7.4.4"
-# addopts = "-rf --color=yes"
-# testpaths = [
-#     "backend-tests"
-# ]
-# python_files =  "tests.py"
+[tool.pytest.ini_options]
+minversion = "7.4.4"
+addopts = "-vv -rf --color=yes"
+testpaths = [
+    "tests"
+]
+python_files = "tests.py"
 
 [tool.isort]
 profile = "black"

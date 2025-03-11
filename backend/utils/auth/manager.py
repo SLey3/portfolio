@@ -2,6 +2,7 @@ import base64
 import random
 import string
 from functools import wraps
+from models import Admin
 
 from flask import request, session
 
@@ -50,3 +51,24 @@ def login_required(func):
             return "", 403
 
     return wrapper
+
+
+def verify_auth(pwd: str, email: str, user_model: Admin) -> tuple[bool, str]:
+    """
+    Verifies the authentication of a user by comparing the provided password and email
+    with the stored password and email in the user model.
+    Args:
+        pwd (str): The hashed password provided by the user.
+        email (str): The email provided by the user.
+        user_model (Admin): The user model containing the stored password and email.
+    Returns:
+        tuple[bool, str]: A tuple containing a boolean and an error message indicating
+                         whether the authentication was successful. If authentication
+                         fails, the error message will describe the reason.
+    """
+    if pwd != user_model.password:
+        return False, "Incorrect Password"
+
+    if email != user_model.email:
+        return False, "Incorrect username"
+    return True, ""

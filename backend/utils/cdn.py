@@ -15,6 +15,7 @@ import uuid
 from io import BytesIO
 from typing import Any, Optional, Tuple, Union
 from urllib.parse import urlparse
+from flask import current_app
 
 import requests
 from dotenv import load_dotenv
@@ -81,7 +82,7 @@ def upload_image(
     options = UploadFileRequestOptions(
         use_unique_file_name=True,
         tags=[tag if tag else "education"],
-        folder="/imgs/",
+        folder="/imgs/" if not current_app.config["TESTING"] else "/testing/",
         is_private_file=False,
         is_published=True,
     )

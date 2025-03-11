@@ -6,7 +6,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, redirect } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -25,6 +25,10 @@ const ViewBlog: React.FC = () => {
 				},
 			})
 			.then((res: AxiosResponse) => {
+				if(!res.data) {
+					navigate("*");
+				}
+
 				setBlog(res.data);
 			})
 			.catch((err: AxiosError) => {
@@ -79,6 +83,12 @@ const ViewBlog: React.FC = () => {
 		},
 		[navigate, BearerToken]
 	);
+
+
+	// check if blog is still draft and if it is redirect to 404
+	if (blog?.is_draft) {
+		redirect("*");
+	}
 
 	return (
 		<>

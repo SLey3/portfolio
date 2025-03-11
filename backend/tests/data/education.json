@@ -1,0 +1,59 @@
+{
+    "add": {
+        "w_grad_d_n_expected": {
+            "name": "2nd Educational Institute",
+            "start_date": "08/2026",
+            "grad_date": "06/2030",
+            "expected_date": "undefined",
+            "institute_type": "University",
+            "awards": "N/A",
+            "major": "Economics",
+            "degree": "Bachelor of Science",
+            "institute_url": "https://example.com",
+            "small_desc": "small description"
+        },
+        "n_grad_d_w_expected": {
+            "name": "3rd Educational Institute",
+            "start_date": "08/2024",
+            "expected_date": "05/2028",
+            "grad_date": "undefined",
+            "institute_type": "University",
+            "awards": "N/A",
+            "major": "Communications",
+            "degree": "Bachelor of Art",
+            "institute_url": "https://example.com/help",
+            "small_desc": "small description"
+        },
+        "incorrect_url": {
+            "name": "5th Educational Institute",
+            "start_date": "08/2024",
+            "expected_date": "08/2028",
+            "institute_type": "University",
+            "awards": "N/A",
+            "major": "Communications",
+            "degree": "Bachelor of Art",
+            "institute_url": "httpsexample,,com",
+            "small_desc": "small description"
+        },
+        "incorrect_institute": {
+            "name": "4th Educational Institute",
+            "start_date": "08/2024",
+            "expected_date": "05/2028",
+            "institute_type": "Elementary School",
+            "awards": "N/A",
+            "major": "Communications",
+            "degree": "Bachelor of Art",
+            "institute_url": "https://example.com/two",
+            "small_desc": "small description"
+        }
+    },
+    "edit": {
+        "other": {
+            "id": 2,
+            "start_date": "07/2026",
+            "grad_date": "07/2030",
+            "awards": "Leadership Award | Pompeii Award of Excellence"
+        },
+        "fields": ["start_date", "grad_date", "awards", "logo_url"]
+    }
+}

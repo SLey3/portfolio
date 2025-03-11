@@ -1,16 +1,17 @@
 import hashlib
 import json
 import uuid
+import ast
 
 import pendulum
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, redirect
 from flask_mail import Message
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
 from app import db, mail
 from models import *  # noqa: F403 | I did this as all models and schemas will be used in this file
-from utils.auth import login_required, login_user, logout_user
+from utils.auth import login_required, login_user, logout_user, verify_auth
 from utils.cdn import (
     delete_blog_images,
     delete_image,
@@ -29,9 +30,27 @@ from utils.sql import (
     paginate_project_posts,
     show_blog_posts,
 )
+from utils.bool import to_bool
 
 # Blueprint registration
 api = Blueprint("api", __name__)
+
+
+@api.get("/")
+def main_page():
+    """
+    simply redirects people to the main website
+    """
+    return redirect("https://www.sleylanguren.com")
+
+
+@api.get("/testing/loginrequired")
+@login_required
+def login_required_test_url():
+    """
+    url endpoint to use during backend testing for the login_required decorator
+    """
+    return "", 200
 
 
 @api.post("/admin/login")
@@ -78,13 +97,11 @@ def admin_login():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    input_pwd = validated_data["password"]
-    hashed_pwd = hashlib.sha256(input_pwd.encode()).hexdigest()
+    hashed_pwd = hashlib.sha256(validated_data["password"].encode()).hexdigest()
+    result, err_msg = verify_auth(hashed_pwd, validated_data["email"], user)
 
-    if hashed_pwd != user.password:
-        return jsonify({"error": "Incorrect password."}), 403
-    elif validated_data["email"] != user.email:
-        return jsonify({"error": "Incorrect username"}), 403
+    if not result:
+        return jsonify({"error": err_msg}), 403
 
     token = login_user(user.username)
     user_dump = dump_schema.dump(user)
@@ -123,6 +140,25 @@ def admin_link_inspector():
 @api.post("/admin/sql")
 @login_required
 def admin_execute_sql():
+    """
+    Endpoint to execute SQL queries for administrator.
+
+    This endpoint allows the administrator to execute SQL queries by sending a POST request
+    with the query in the request body.
+
+    Returns:
+        JSON response containing the result of the SQL query or an error message.
+
+    Request Body:
+        {
+            "query": "SQL query string"
+        }
+
+    Responses:
+        200: A JSON object containing the result of the SQL query.
+        400: A JSON object with an error message if no data was provided.
+        Other: A JSON object with an error message and the corresponding status code if the query execution fails.
+    """
     data = request.get_json(silent=True)
 
     if not data:
@@ -191,19 +227,19 @@ def newsletter_unsubscribe():
         return (
             jsonify(
                 {
-                    "expired": """Token is expired.
+                    "expired": """Token is expired or invalid.
                 Either request unsubscribing thru the unsubscribe link in the newsletter
-                or contact me to request to unsubscribe from the newseltter"""
+                or contact me to request to unsubscribe from the newsletter"""
                 }
             ),
             400,
         )
 
     subscriber = db.session.execute(
-        db.select(NewsLetterList).filter_by(email=data["email"]).first()
-    ).scalar()
+        db.select(NewsLetterList).filter_by(email=data["email"])
+    ).first()
 
-    db.session.delete(subscriber)
+    db.session.delete(subscriber[0])
     db.session.commit()
     return jsonify({"success": "Email has been unsubscribed!"})
 
@@ -211,6 +247,15 @@ def newsletter_unsubscribe():
 @api.get("/newsletter/getsubs")
 @login_required
 def newsletter_getsubs():
+    """
+    Fetches the list of newsletter subscribers.
+
+    This endpoint retrieves all the subscribers from the newsletter list,
+    excluding their IDs, and returns their email addresses in JSON format.
+
+    Returns:
+        JSON response containing a list of email addresses of the newsletter subscribers.
+    """
     schema = NewsLetterSchema(many=True, exclude=("id",))
     query_res = db.session.execute(db.select(NewsLetterList)).scalars()
 
@@ -222,6 +267,19 @@ def newsletter_getsubs():
 @api.route("/newsletter/draft", methods=["GET", "POST", "DELETE"])
 @login_required
 def newsletter_draft():
+    """
+    Handles the newsletter draft operations.
+
+    This route supports the following methods:
+    - GET: Retrieves the current newsletter draft.
+    - POST: Creates or updates the newsletter draft.
+    - DELETE: Deletes the current newsletter draft.
+
+    Returns:
+        - GET: Serialized newsletter draft content or a 204 status code if no draft exists.
+        - POST: 200 status code on successful creation or update.
+        - DELETE: 200 status code on successful deletion.
+    """
     match request.method:
         case "GET":
             schema = NewsLetterDraftContentSchema()
@@ -326,7 +384,13 @@ def newsletter_send():
 
 @api.post("/education/courses")
 def get_courses():
-    """ """
+    """
+    Handles POST requests to retrieve courses associated with a specific institute.
+
+    Returns:
+        JSON response containing a list of courses associated with the provided institute.
+        If no data is provided in the request, returns an error message with a 400 status code.
+    """
     schema = CourseSchema(many=True)
     data = request.get_json(silent=True)
 
@@ -343,7 +407,17 @@ def get_courses():
 @api.post("/education/courses/add")
 @login_required
 def add_course():
-    """ """
+    """
+    Endpoint to add a new course to the education database.
+
+    Request Body:
+        JSON object containing the course details as per the CourseSchema.
+    Returns:
+        JSON response indicating the success or failure of the operation.
+        - On success: {"success": 'Entry: "<course_id>" has been successfully added!'}
+        - On failure: {"error": "No data provided"} with status code 400 if no data is provided.
+                    {"errors": <validation_errors>} with status code 403 if validation fails.
+    """
     schema = CourseSchema()
     data = request.get_json(silent=True)
 
@@ -372,9 +446,28 @@ def add_course():
 @api.put("/education/courses/edit")
 @login_required
 def edit_course():
-    """ """
+    """
+    Edit an existing course with the provided fields.
+
+    This endpoint allows authenticated users to edit specific fields of an existing course.
+    The fields to be edited are specified in the request form under the key "fields".
+
+    Returns:
+        JSON response indicating success or failure of the update operation.
+
+    Raises:
+        ValidationError: If the provided data does not pass validation.
+
+    Request form data:
+        fields (str): A JSON string representing a list of fields to be edited.
+        Other form data: Key-value pairs corresponding to the fields specified in "fields".
+
+    Response:
+        200: A JSON object with a success message if the course is successfully updated.
+        403: A JSON object with error messages if validation fails.
+    """
     fields = request.form.get("fields")
-    parsed_fields = tuple(json.loads(fields))
+    parsed_fields = tuple(ast.literal_eval(fields))
     schema = CourseSchema(only=parsed_fields)
     data = {key: value for key, value in request.form.items() if key != "fields"}
 
@@ -398,22 +491,39 @@ def edit_course():
 @api.delete("/education/courses/delete")
 @login_required
 def delete_course():
-    """ """
+    """
+    Deletes a course from the database.
+
+    Endpoint: DELETE /education/courses/delete
+
+    Request Body (JSON):
+        {
+            "course_id": int  # ID of the course to be deleted
+        }
+
+    Responses:
+        200 OK:
+            {
+                "success": str  # Success message with the name of the deleted course
+            }
+        400 Bad Request:
+            {
+                "error": "No data provided!"  # Error message if no data is provided in the request
+            }
+    """
     data = request.get_json(silent=True)
 
     if not data:
-        return jsonify({"error": "No data provided!"})
+        return jsonify({"error": "No data provided!"}), 400
 
     course_id = data["course_id"]
 
     course = db.session.execute(db.select(Course).filter_by(id=course_id)).scalar()
 
-    name = course.course_name
-
     db.session.delete(course)
     db.session.commit()
 
-    return jsonify({"success": f"{name} has been deleted!"})
+    return jsonify({"success": f"{course.course_name} has been deleted!"})
 
 
 @api.get("/education/institute")
@@ -452,7 +562,7 @@ def institute_add():
     data = request.form.get("other")
     img_file = request.files.get("file")
 
-    if not data:
+    if not data and not img_file:
         return jsonify({"error": "No data provided"}), 400
 
     try:
@@ -534,17 +644,16 @@ def edit_institute():
     Returns:
         A JSON response indicating the success of the operation.
     """
-    _fields = request.form.get("fields")
+    fields = tuple(json.loads(request.form.get("fields")))
     img_file = request.files.get("file")
-    data = request.form.get("other")
-    parsed_fields = tuple(json.loads(_fields))
-    fields = tuple(filter(lambda x: x != "logo_url", parsed_fields))
-    schema = EducationSchema(only=parsed_fields)
+    _data = json.loads(request.form.get("other"))
 
+    schema = EducationSchema(only=fields)
+    data = {k: v for k, v in _data.items() if k not in ["logo_url"]}
     try:
-        serialized_data = schema.loads(data)
+        serialized_data = schema.load(data, partial=["logo_url"], unknown="include")
     except ValidationError as err:
-        return jsonify({"errors": err.messages}), 400
+        return jsonify({"errors": err.messages}), 403
 
     institute = db.session.execute(
         db.select(Education).filter_by(id=int(serialized_data["id"]))
@@ -559,9 +668,8 @@ def edit_institute():
 
                 setattr(institute, field, parsed_date)
             case "logo_url":
-                prefix = "image_"
-                unique_id = uuid.uuid4().hex
-                img_name = secure_filename(prefix + unique_id + ".png")
+                file_ext = get_file_extension(img_file.mimetype)
+                img_name = secure_filename(f"image_{uuid.uuid4().hex}.{file_ext}")
                 new_url, new_id = patch_image(img_file, img_name, institute.logo_id)
                 setattr(institute, field, new_url)
                 institute.logo_id = new_id
@@ -910,7 +1018,7 @@ def get_projects():
     Raises:
         None
     """
-    current_page = request.args.get("page", None, int)
+    current_page = request.args.get("page", type=int)
     schema = ProjectPostSchema(many=True)
 
     if not current_page:
@@ -1031,7 +1139,7 @@ def delete_project():
 
 @api.get("/blog")
 def get_blogs():
-    total_pages = request.args.get("tp", None, int)
+    total_pages = request.args.get("tp", type=int)
     total_blogs = get_total_blog_posts(db.engine)
     schema = BlogPostSchema(many=True)
 
@@ -1049,9 +1157,12 @@ def get_blogs():
 @api.get("/blog/singular")
 def get_blog():
     blog_id = request.args.get("id", type=int)
-    editing = request.args.get("edit")
+    editing = request.args.get("edit", type=bool)
 
-    if editing == "true":
+    if not blog_id:
+        return jsonify({"error": "No id was provided"}), 400
+
+    if editing:
         schema = BlogPostSchema()
     else:
         schema = BlogPostSchema(
@@ -1060,9 +1171,6 @@ def get_blog():
                 "desc",
             )
         )
-
-    if not blog_id:
-        return jsonify({"error": "No id was provided"}), 400
 
     blog_post = db.session.execute(db.select(BlogPost).filter_by(id=blog_id)).scalar()
 
@@ -1110,10 +1218,11 @@ def add_blog():
         "content": content,
         "title": title,
         "desc": desc,
-        "is_draft": is_draft == "true",
+        "is_draft": to_bool(is_draft),
     }
 
-    data["content"] = upload_blog_images(data["content"])
+    content = upload_blog_images(data["content"])
+    data["content"] = json.dumps(content)
 
     try:
         serialized_data = schema.load(data)
@@ -1145,11 +1254,11 @@ def edit_blog():
 
     is_draft = data.get("is_draft")
     content = data.get("content")
-    has_img = request.form.get("has_image", False)
-    img_del = request.form.get("img_del", False)
+    has_img = request.form.get("has_image", False, to_bool)
+    img_del = request.form.get("img_del", False, to_bool)
 
     if is_draft:
-        data["is_draft"] = is_draft == "true"
+        data["is_draft"] = to_bool(is_draft)
 
     current_blog = db.session.execute(
         db.select(BlogPost).filter_by(id=data.pop("id"))
@@ -1157,9 +1266,9 @@ def edit_blog():
 
     if content:
         content = json.loads(content)
-        if has_img == "True":
+        if has_img:
             data["content"] = patch_blog_images(content)
-        elif img_del == "True":
+        elif img_del:
             cur_data = json.loads(data["cur_data"])
             res = delete_blog_images(cur_data)
 
@@ -1174,9 +1283,9 @@ def edit_blog():
     if schema.only:
         for field in schema.only:
             if field == "content":
-                current_blog.content = content
-
-            setattr(current_blog, field, serialized_data[field])
+                current_blog.content = json.dumps(content)
+            else:
+                setattr(current_blog, field, serialized_data[field])
 
     db.session.commit()
     return jsonify({"success": "Blog has been successfully updated!"})

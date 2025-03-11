@@ -1,6 +1,24 @@
 import type { AxiosError } from 'axios';
 import type { FieldValues, UseFormSetError } from 'react-hook-form';
 
+
+/**
+ * Safely retrieves the value of a specified property from an object.
+ *
+ * @template T - The type of the object.
+ * @template K - The type of the key, which must be a key of T.
+ * @param {T} obj - The object from which to retrieve the property.
+ * @param {K} key - The key of the property to retrieve.
+ * @returns {T[K] | null} - The value of the specified property, or null if the property does not exist.
+ */
+export function getattr<T extends object, K extends keyof T>(
+	obj: T,
+	key: K
+): T[K] | null {
+	return key in obj ? obj[key] : null;
+}
+
+
 /**
  * Sets form errors based on the Axios error response.
  *
@@ -57,8 +75,8 @@ export function getAdminLinkHighlightColor(status_code: number): string {
  * @returns The formatted content as an object.
  * @throws Will throw an error if the content is a string and cannot be parsed as JSON.
  */
-export const formatEditorContent = (content: object | string) => {
-	return typeof content === 'object' ? content : JSON.parse(content);
+export const formatEditorContent = (content: string) => {
+	return JSON.parse(content);
 };
 
 /**

@@ -82,25 +82,34 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
 
                 for row in column_res:
                     url = row[1]
-                    res = requests.head(url)
 
-                    if not res.ok:
-                        if (
-                            "Server" in res.headers
-                            and "AkamaiGHost" in res.headers["Server"]
-                        ):
+                    try:
+                        res = requests.head(url, timeout=30)
+                    except requests.exceptions.Timeout:
+                        results.append(
+                            {
+                                "tablename": table_name,
+                                "item_id": row[0],
+                                "link": url,
+                                "validity": False,
+                                "http_code": res.status_code,
+                            }
+                        )
+                        continue
+
+                    if not res.ok and "Server" in res.headers:
+                        if "AkamaiGHost" in res.headers["Server"]:
                             validity = (
-                                "Validity check failed due to AkamaiGHost interfering"
+                                "Validity check failed due to AkamaiGHost blocking"
                             )
-                        elif "CF-RAY" in res.headers or (
-                            "Server" in res.headers
+
+                        if (
+                            "CF-RAY" in res.headers
                             and "cloudflare" in res.headers["Server"]
                         ):
                             validity = (
-                                "Validity check failed due to CloudFlare Interfering"
+                                "Validity check failed due to CloudFlare blocking"
                             )
-                        else:
-                            validity = False
                     else:
                         validity = str(res.status_code).startswith("2")
 
@@ -172,7 +181,7 @@ def showcase_has_data(engine: Engine) -> bool:
     """
     with Session(engine) as session:
         count = session.execute(
-            select(func.count("*").label("showcase_total_count")).select_from(
+            select(func.count().label("showcase_total_count")).select_from(
                 text("showcase")
             )
         ).scalar()
@@ -195,7 +204,7 @@ def get_total_project_pages(engine: Engine) -> int:
     """
     with Session(engine) as session:
         total_count = session.execute(
-            select(func.count("*").label("project_total_count")).select_from(
+            select(func.count().label("project_total_count")).select_from(
                 text("project_post")
             )
         ).scalar()
@@ -238,7 +247,7 @@ def get_total_blog_posts(engine: Engine) -> int:
     """
     with Session(engine) as session:
         total_blogs = session.execute(
-            select(func.count("*").label("blog_total_count")).select_from(
+            select(func.count().label("blog_total_count")).select_from(
                 text("blog_post")
             )
         ).scalar()
