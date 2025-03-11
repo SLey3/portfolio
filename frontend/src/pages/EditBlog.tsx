@@ -5,7 +5,6 @@ import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
 import {
 	SetFormErrors,
-	formatEditorContent,
 	serializeEditorContent,
 } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
