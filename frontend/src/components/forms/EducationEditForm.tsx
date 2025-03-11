@@ -1,4 +1,4 @@
-import { getattr, SetFormErrors } from '@/utils';
+import { SetFormErrors, getattr } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, HR, Label, TextInput, Textarea } from 'flowbite-react';
 import React, { useState } from 'react';
@@ -49,41 +49,57 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 		const BearerToken = localStorage.getItem('token');
 		const parsed_data = new Map();
 		const edited_fields = ['id'];
-		
+
 		parsed_data.set('id', formInfo.id.toString());
-		
+
 		// Fields to be added dynamically
 		const fieldsToAppend = [
-			'name', 'start_date', 'grad_date', 'expected_date', 
-			'institute_type', 'major', 'degree', 'institute_url', 'small_desc'
+			'name',
+			'start_date',
+			'grad_date',
+			'expected_date',
+			'institute_type',
+			'major',
+			'degree',
+			'institute_url',
+			'small_desc',
 		];
-		
+
 		// Append fields dynamically
-		fieldsToAppend.forEach(field => {
+		fieldsToAppend.forEach((field) => {
 			if (field in data) {
-				formdata.append(field, getattr<typeof data, keyof InstituteEditProps>(data, field as keyof InstituteEditProps) as string);
+				formdata.append(
+					field,
+					getattr<typeof data, keyof InstituteEditProps>(
+						data,
+						field as keyof InstituteEditProps
+					) as string
+				);
 			}
 		});
-		
+
 		// Special handling for awards
 		if (data.awards) {
-			formdata.append('awards', Array.isArray(data.awards) ? data.awards.join(',') : data.awards);
+			formdata.append(
+				'awards',
+				Array.isArray(data.awards) ? data.awards.join(',') : data.awards
+			);
 		}
-		
+
 		// Handle file upload
 		if (file) {
 			formdata.append('file', file);
 			edited_fields.push('logo_url');
 		}
-		
+
 		// Skip further processing if no form data was added
 		if (![...formdata.keys()].length) return;
-		
+
 		edited_fields.push(...formdata.keys());
-		const filtered_fields = edited_fields.filter(val => val !== 'file');
-		
+		const filtered_fields = edited_fields.filter((val) => val !== 'file');
+
 		// Populate parsed_data with filtered fields
-		filtered_fields.forEach(field => {
+		filtered_fields.forEach((field) => {
 			if (formdata.has(field)) {
 				parsed_data.set(field, formdata.get(field));
 			}
@@ -91,8 +107,10 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 
 		// Append metadata fields
 		formdata.append('fields', JSON.stringify(filtered_fields));
-		formdata.append('other', JSON.stringify(Object.fromEntries(parsed_data)));
-		
+		formdata.append(
+			'other',
+			JSON.stringify(Object.fromEntries(parsed_data))
+		);
 
 		axios
 			.put('/api/education/institute/edit', formdata, {

@@ -1,7 +1,6 @@
 import type { AxiosError } from 'axios';
 import type { FieldValues, UseFormSetError } from 'react-hook-form';
 
-
 /**
  * Safely retrieves the value of a specified property from an object.
  *
@@ -17,7 +16,6 @@ export function getattr<T extends object, K extends keyof T>(
 ): T[K] | null {
 	return key in obj ? obj[key] : null;
 }
-
 
 /**
  * Sets form errors based on the Axios error response.

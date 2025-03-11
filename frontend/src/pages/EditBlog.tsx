@@ -3,10 +3,7 @@ import Header from '@/components/Header';
 import NavBar from '@/components/NavBar';
 import TextEditor from '@/components/editor';
 import ProtectedComponent from '@/components/protected';
-import {
-	SetFormErrors,
-	serializeEditorContent,
-} from '@/utils';
+import { SetFormErrors, serializeEditorContent } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTextEditor } from '@/utils/plate/editor';
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
@@ -31,7 +28,7 @@ const EditBlog: React.FC = () => {
 		handleSubmit,
 		setError,
 		control,
-		getValues
+		getValues,
 	} = useForm<BlogEditProps>();
 	const { blogId } = useParams();
 	const [searchParams] = useSearchParams();
@@ -61,13 +58,13 @@ const EditBlog: React.FC = () => {
 
 				setBlogInfo(res.data);
 
-				console.log("content type: ", typeof res.data.content)
-				console.log("content: ", res.data.content)
+				console.log('content type: ', typeof res.data.content);
+				console.log('content: ', res.data.content);
 
 				const content = JSON.parse(res.data.content);
 
-				console.log("type of content after parse: ", typeof content);
-				console.log("content after parse: ", content);
+				console.log('type of content after parse: ', typeof content);
+				console.log('content after parse: ', content);
 
 				editor.children = content;
 
@@ -232,7 +229,11 @@ const EditBlog: React.FC = () => {
 					{blogInfo ? (
 						<TextEditor
 							editor={editor}
-							footerText={getValues("title") ? `editing blog: ${getValues("title")}` : `editing blog: ${blogInfo.title}`}
+							footerText={
+								getValues('title')
+									? `editing blog: ${getValues('title')}`
+									: `editing blog: ${blogInfo.title}`
+							}
 						/>
 					) : null}
 					<div className="px-3 py-5">
