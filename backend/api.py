@@ -1165,12 +1165,7 @@ def get_blog():
     if editing:
         schema = BlogPostSchema()
     else:
-        schema = BlogPostSchema(
-            exclude=(
-                "is_draft",
-                "desc",
-            )
-        )
+        schema = BlogPostSchema(exclude=("desc",))
 
     blog_post = db.session.execute(db.select(BlogPost).filter_by(id=blog_id)).scalar()
 
