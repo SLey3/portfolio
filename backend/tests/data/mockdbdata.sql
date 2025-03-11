@@ -1,0 +1,8 @@
+-- Setup Mock Database with set values
+-- unhashed mock admin pwd: b'RAYiSGAqjAke'
+
+INSERT INTO admin (username, email, password) VALUES ('Administrator', 'admin@admin.com', 'f3eef3173bbe083b0794b7f863061ebd76a9ee7e1e30435e07cae4b690f44302');
+INSERT INTO education (name, start_date, grad_date, institute_type, awards, major, degree, logo_url, logo_id, institute_url, small_desc, created_at) VALUES ('Educational Institute', 'August 2023', 'May 2027', 'University', 'STEM Scholar|Educational Leaders', 'Computer Science', 'Bachelors of Science', 'https://ik.imagekit.io/8jh2j8rnw/imgs/image_e7b84438073c4387ba924679de7a2a24_L1AGBNS_J.jpg', '66e388efe375273f601a81f6', 'https://example.com/', 'Educational Institute is a private liberal arts college.', 'September 12, 2024 11:32:08 PM UTC');
+INSERT INTO course (course_name, course_id, course_url, associated_institute, "desc") VALUES ('Example Course', 'EX-101', 'https://example.com/', 'Educational Institute', 'This is an example course!');
+INSERT INTO cert_and_license (name, issuing_org, issue_date, credential_id, credential_url, created_at) VALUES ('Example Certificate', 'Example Organization', 'April 2024', 'gf45fey0943r', 'https://example.com/', 'September 12, 2024 11:32:08 PM UTC');
+INSERT INTO project_post (name, start_date, "desc", skills, project_repo_url, created_at) VALUES ('Example Project', 'January 2023', 'An Example Project!', 'typescript|python|project management|frontend', 'https://example.com/', 'September 12, 2024 11:32:08 PM UTC');

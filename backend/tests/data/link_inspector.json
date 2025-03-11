@@ -1,0 +1,37 @@
+[
+    {
+        "http_code": 200,
+        "item_id": 1,
+        "link": "https://example.com/",
+        "tablename": "cert_and_license",
+        "validity": true
+    },
+    {
+        "http_code": 200,
+        "item_id": 1,
+        "link": "https://example.com/",
+        "tablename": "course",
+        "validity": true
+    },
+    {
+        "http_code": 200,
+        "item_id": 1,
+        "link": "https://ik.imagekit.io/8jh2j8rnw/imgs/image_e7b84438073c4387ba924679de7a2a24_L1AGBNS_J.jpg",
+        "tablename": "education",
+        "validity": true
+    },
+    {
+        "http_code": 200,
+        "item_id": 1,
+        "link": "https://example.com/",
+        "tablename": "education",
+        "validity": true
+    },
+    {
+        "http_code": 200,
+        "item_id": 1,
+        "link": "https://example.com/",
+        "tablename": "project_post",
+        "validity": true
+    }
+]

@@ -12,9 +12,6 @@ __pycache__/
 instance/
 migrations/versions/*.py
 
-# CDN folder | In production the CDN will be provided thru CloudFlare CDN
-cdn/ 
-
 # testing resources
 .pytest_cache/
 .coverage
@@ -25,5 +22,5 @@ dist/
 build/
 *.egg-info/
 
-# temp ignore
-backend-tests
+# temporary ignore (might be used in the future)
+utils/cache.py

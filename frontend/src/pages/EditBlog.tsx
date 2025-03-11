@@ -62,7 +62,15 @@ const EditBlog: React.FC = () => {
 
 				setBlogInfo(res.data);
 
-				editor.children = formatEditorContent(res.data.content);
+				console.log("content type: ", typeof res.data.content)
+				console.log("content: ", res.data.content)
+
+				const content = JSON.parse(res.data.content);
+
+				console.log("type of content after parse: ", typeof content);
+				console.log("content after parse: ", content);
+
+				editor.children = content;
 
 				toast.info('blog data loaded!', {
 					closeButton: false,

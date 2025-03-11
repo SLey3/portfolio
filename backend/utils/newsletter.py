@@ -1,11 +1,7 @@
-import os
-from threading import Lock
-
-import pendulum
 from itsdangerous import BadTimeSignature, URLSafeTimedSerializer
 
 __all__ = [
-    "update_serializer_and_salt",
+    "init_serializer_and_salt",
     "generate_unsubscribe_token",
 ]
 
@@ -13,38 +9,9 @@ EXPIRATION_TIME = 2 * 86400  # fmt: skip # formula to convert days to seconds | 
 serializer = None
 
 
-class _Salt:
-    def __init__(self):
-        self.generated_day = None
-        self.salt = None
-        self.lock = Lock()
-
-    def generate_salt(self):
-        with self.lock:
-            tz = pendulum.local_timezone()
-            today = pendulum.now(tz)
-
-            if not isinstance(self.generated_day, pendulum.DateTime):
-                self.salt = os.urandom(16)
-                self.generated_day = today
-                return
-
-            diff = self.generated_day.diff(today).in_days()
-
-            if diff >= 2:
-                self.salt = os.urandom(16)
-                self.generated_day = today
-
-
-_salter = _Salt()
-
-
-def update_serializer_and_salt(app):
+def init_serializer_and_salt(app):
     global serializer
-
-    _salter.generate_salt()
-
-    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"], _salter.salt)
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"], app.config["NL_SALT"])
 
 
 def generate_unsubscribe_token(user_email: str) -> str:
@@ -56,9 +23,7 @@ def generate_unsubscribe_token(user_email: str) -> str:
         str: A serialized token containing the user's email.
     """
     data = {"email": user_email}
-
     token = serializer.dumps(data)
-
     return token
 
 

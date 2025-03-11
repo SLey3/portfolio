@@ -1,0 +1,23 @@
+{
+    "add": {
+        "id": 2,
+        "course_name": "Example Course 2",
+        "course_id": "EX-102",
+        "course_url": "https://example.com/2",
+        "associated_institute": "Educational Institute",
+        "desc": "Another Small desc"
+    },
+    "edit": {
+        "input": {
+            "fields": "['id', 'course_name', 'course_id']",
+            "id": 2,
+            "course_name": "EC",
+            "course_id": "EX-001"
+        },
+        "val_err": {
+            "errors": {
+                "course_url": [""]
+            }
+        }
+    }
+}

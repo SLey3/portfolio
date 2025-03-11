@@ -1,4 +1,4 @@
-import { SetFormErrors } from '@/utils';
+import { getattr, SetFormErrors } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, HR, Label, TextInput, Textarea } from 'flowbite-react';
 import React, { useState } from 'react';
@@ -49,74 +49,50 @@ const EducationEditForm: React.FC<EditFormProps<InstituteProps>> = ({
 		const BearerToken = localStorage.getItem('token');
 		const parsed_data = new Map();
 		const edited_fields = ['id'];
-
+		
 		parsed_data.set('id', formInfo.id.toString());
-
-		if (data.name) {
-			formdata.append('name', data.name);
-		}
-
-		if (data.start_date) {
-			formdata.append('start_date', data.start_date);
-		}
-
-		if (data.grad_date) {
-			formdata.append('grad_date', data.grad_date);
-		}
-
-		if (data.expected_date) {
-			formdata.append('expected_date', data.expected_date);
-		}
-
-		if (data.institute_type) {
-			formdata.append('institute_type', data.institute_type);
-		}
-
+		
+		// Fields to be added dynamically
+		const fieldsToAppend = [
+			'name', 'start_date', 'grad_date', 'expected_date', 
+			'institute_type', 'major', 'degree', 'institute_url', 'small_desc'
+		];
+		
+		// Append fields dynamically
+		fieldsToAppend.forEach(field => {
+			if (field in data) {
+				formdata.append(field, getattr<typeof data, keyof InstituteEditProps>(data, field as keyof InstituteEditProps) as string);
+			}
+		});
+		
+		// Special handling for awards
 		if (data.awards) {
-			formdata.append(
-				'awards',
-				Array.isArray(data.awards) ? data.awards.join(',') : data.awards
-			);
+			formdata.append('awards', Array.isArray(data.awards) ? data.awards.join(',') : data.awards);
 		}
-
-		if (data.major) {
-			formdata.append('major', data.major);
-		}
-
-		if (data.degree) {
-			formdata.append('degree', data.degree);
-		}
-
+		
+		// Handle file upload
 		if (file) {
 			formdata.append('file', file);
 			edited_fields.push('logo_url');
 		}
-
-		if (data.institute_url) {
-			formdata.append('institute_url', data.institute_url);
-		}
-
-		if (data.small_desc) {
-			formdata.append('small_desc', data.small_desc);
-		}
-
-		if (formdata.entries().next().done) {
-			return;
-		}
-
+		
+		// Skip further processing if no form data was added
+		if (![...formdata.keys()].length) return;
+		
 		edited_fields.push(...formdata.keys());
-		const filtered_fields = edited_fields.filter((val) => val !== 'file');
-
-		for (const pair of formdata.entries()) {
-			if (filtered_fields.includes(pair[0])) {
-				parsed_data.set(pair[0], pair[1]);
+		const filtered_fields = edited_fields.filter(val => val !== 'file');
+		
+		// Populate parsed_data with filtered fields
+		filtered_fields.forEach(field => {
+			if (formdata.has(field)) {
+				parsed_data.set(field, formdata.get(field));
 			}
-		}
+		});
 
-		const obj = Object.fromEntries(parsed_data);
-
+		// Append metadata fields
 		formdata.append('fields', JSON.stringify(filtered_fields));
-		formdata.append('other', JSON.stringify(obj));
+		formdata.append('other', JSON.stringify(Object.fromEntries(parsed_data)));
+		
 
 		axios
 			.put('/api/education/institute/edit', formdata, {
