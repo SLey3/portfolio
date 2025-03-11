@@ -25,12 +25,8 @@ const ViewBlog: React.FC = () => {
 				},
 			})
 			.then((res: AxiosResponse) => {
-				if (!res.data) {
-					return navigate('*');
-				}
-
-				if (res.data.is_draft) {
-					return navigate('/*');
+				if (!res.data || res.data.is_draft) {
+					return navigate('/404');
 				}
 
 				setBlog(res.data);
