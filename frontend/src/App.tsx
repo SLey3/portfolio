@@ -1,3 +1,6 @@
+import { withProfiler, withSentryReactRouterV6Routing } from '@sentry/react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+
 import AboutMe from '@/pages/About';
 import AdminDashboard from '@/pages/AdminDashboard';
 import BlogPosts from '@/pages/Blogs';
@@ -14,15 +17,17 @@ import Projects from '@/pages/Projects';
 import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
 import Http404 from '@/pages/http/404';
-import { withProfiler, withSentryReactRouterV6Routing } from '@sentry/react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 export function App() {
 	const SentryRoutes = withSentryReactRouterV6Routing(Routes);
 
 	return (
 		<>
-			<Router future={{ v7_startTransition: true }}>
+			<Router
+				future={{
+					v7_startTransition: true,
+					v7_relativeSplatPath: true,
+				}}>
 				<SentryRoutes>
 					<Route Component={Home} path="/" />
 					<Route Component={Education} path="/education" />

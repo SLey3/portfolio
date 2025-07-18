@@ -3,6 +3,8 @@ exclude=__pycache__, migrations, instance, backend-tests
 max-line-length=137
 extend-ignore=
     E203
+    E221
+    E222
     E701
     VNE003
     F405

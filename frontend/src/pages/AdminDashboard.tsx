@@ -1,8 +1,3 @@
-import { MediumCard } from '@/components/Cards';
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import ProtectedComponent from '@/components/protected';
 import { getAdminLinkHighlightColor } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -14,6 +9,12 @@ import { FaPencil, FaTrash } from 'react-icons/fa6';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { MediumCard } from '@/components/Cards';
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import ProtectedComponent from '@/components/protected';
 
 const AdminDashboard: React.FC = () => {
 	const [linkResults, setLinkResults] = useState<null | LinkResultsProps[]>(

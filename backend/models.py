@@ -249,7 +249,7 @@ class Showcase(db.Model):
     project_posts = db.relationship(
         "ProjectPost",
         secondary="project_showcase",
-        backref=db.backref("showcases", lazy="dynamic"),
+        backref=db.backref("showcase", lazy="dynamic"),
     )
 
     def remove_project(self, project_post):
@@ -377,6 +377,7 @@ class ProjectPostSchema(ma.SQLAlchemyAutoSchema):
 
 class ShowcaseSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        meta = Showcase
+        model = Showcase
+        include_relationships = True
 
     project_posts = ma.Nested(ProjectPostSchema, many=True)

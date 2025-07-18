@@ -1,8 +1,9 @@
-import { Editor } from '@/components/plate-ui/editor';
 import { useTextEditor } from '@/utils/plate/editor';
 import { CommentProvider } from '@udecode/plate-comments/react';
 import { Plate } from '@udecode/plate-common/react';
 import React, { Suspense } from 'react';
+
+import { Editor } from '@/components/plate-ui/editor';
 
 const BlogViewer: React.FC<BlogViewerProps> = ({ content }) => {
 	const editor = useTextEditor();

@@ -1,9 +1,3 @@
-import { MediumCard } from '@/components/Cards';
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import ProjectsAddForm from '@/components/forms/ProjectsAddForm';
-import ProjectsEditForm from '@/components/forms/ProjectsEditForm';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Pagination } from 'flowbite-react';
@@ -15,6 +9,13 @@ import { FaPencil } from 'react-icons/fa6';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { MediumCard } from '@/components/Cards';
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import ProjectsAddForm from '@/components/forms/ProjectsAddForm';
+import ProjectsEditForm from '@/components/forms/ProjectsEditForm';
 
 const Projects: React.FC = () => {
 	const [projects, setProjects] = useState<ProjectProps[]>([]);

@@ -1,7 +1,3 @@
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import ShowcaseAddForm from '@/components/forms/ShowcaseAddForm';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Carousel, HR } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
@@ -10,6 +6,11 @@ import { CiSquarePlus } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import ShowcaseAddForm from '@/components/forms/ShowcaseAddForm';
 
 const Showcase: React.FC = () => {
 	const [showcases, setShowcases] = useState<ShowcaseProps | null>(null);

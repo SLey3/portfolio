@@ -54,6 +54,6 @@
             "grad_date": "07/2030",
             "awards": "Leadership Award | Pompeii Award of Excellence"
         },
-        "fields": ["start_date", "grad_date", "awards", "logo_url"]
+        "fields": ["id", "start_date", "grad_date", "awards", "logo_url"]
     }
 }
