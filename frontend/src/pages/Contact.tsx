@@ -1,13 +1,14 @@
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import Section from '@/components/section';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Label, Select, TextInput, Textarea } from 'flowbite-react';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { MdAlternateEmail, MdSend } from 'react-icons/md';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
+
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import Section from '@/components/section';
 
 const Contact: React.FC = () => {
 	const [isProcessing, setIsProcessing] = useState(false);

@@ -977,6 +977,8 @@ def get_showcase():
     schema = ShowcaseSchema()
     showcase = db.session.query(Showcase).first()
 
+    print(schema.dump(showcase))
+
     return schema.dump(showcase)
 
 
@@ -1083,9 +1085,8 @@ def add_project():
 @api.put("/projects/edit")
 @login_required
 def edit_projects():
-    fields = request.form.get("fields")
-    parsed_fields = tuple(json.loads(fields))
-    schema = ProjectPostSchema(only=parsed_fields)
+    fields = tuple(json.loads(request.form.get("fields")))
+    schema = ProjectPostSchema(only=fields)
     data = {key: value for key, value in request.form.items() if key != "fields"}
 
     try:
@@ -1094,7 +1095,7 @@ def edit_projects():
         return jsonify({"errors": err.messages}), 400
 
     project = db.session.execute(
-        db.select(ProjectPost).filter_by(id=int(data["id"]))
+        db.select(ProjectPost).filter_by(id=int(serialized_data["id"]))
     ).scalar()
 
     for field in schema.only:
@@ -1112,21 +1113,23 @@ def edit_projects():
     return jsonify({"success": f"{project.name} has been successfully updated!"})
 
 
-@api.delete("/api/projects/delete")
+@api.delete("/projects/delete")
 @login_required
 def delete_project():
     data = request.get_json(silent=True)
 
     if not data:
-        return jsonify({"error": "No data was provided!"})
+        return jsonify({"error": "No data was provided!"}), 400
 
     project = db.session.execute(
         db.select(ProjectPost).filter_by(id=int(data["id"]))
     ).scalar()
 
-    showcase = db.session.execute(
-        db.select(Showcase.project_posts).filter_by(project_id=project.id)
-    ).scalar_one_or_none()
+    showcase = (
+        db.session.query(Showcase)
+        .filter(Showcase.project_posts.any(ProjectPost.id == project.id))
+        .one_or_none()
+    )
 
     if showcase is not None:
         showcase.remove_project(project)
@@ -1157,7 +1160,7 @@ def get_blogs():
 @api.get("/blog/singular")
 def get_blog():
     blog_id = request.args.get("id", type=int)
-    editing = request.args.get("edit", type=bool)
+    editing = request.args.get("edit", type=to_bool)
 
     if not blog_id:
         return jsonify({"error": "No id was provided"}), 400
@@ -1206,7 +1209,9 @@ def add_blog():
     is_draft = request.form.get("is_draft")
     schema = BlogPostSchema()
 
-    if not any([content, title, desc]):
+    print(f"content: {content}", f"title: {title}", f"desc: {desc}", sep="\n")
+
+    if not all([content, title, desc]):
         return jsonify({"error": "No data was provided!"}), 400
 
     data = {
@@ -1238,18 +1243,18 @@ def edit_blog():
     fields = request.form.get("fields")
     raw_fields = tuple(json.loads(fields))
     parsed_fields = tuple(
-        filter(lambda x: x not in ["has_image", "img_del", "id"], raw_fields)
+        filter(lambda x: x not in ["has_img", "img_del", "id"], raw_fields)
     )
     schema = BlogPostSchema(only=parsed_fields) if parsed_fields else BlogPostSchema()
     data = {
         key: value
         for key, value in request.form.items()
-        if key not in ["fields", "has_image", "img_del"]
+        if key not in ["fields", "has_img", "img_del"]
     }
 
     is_draft = data.get("is_draft")
     content = data.get("content")
-    has_img = request.form.get("has_image", False, to_bool)
+    has_img = request.form.get("has_img", False, to_bool)
     img_del = request.form.get("img_del", False, to_bool)
 
     if is_draft:

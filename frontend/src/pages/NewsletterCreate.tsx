@@ -1,6 +1,3 @@
-import Header from '@/components/Header';
-import TextEditor from '@/components/editor';
-import ProtectedComponent from '@/components/protected';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTempEditor } from '@/utils/hooks/use-temp-editor';
 import { useTextEditor } from '@/utils/plate/editor';
@@ -22,6 +19,10 @@ import { FiSend } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import Header from '@/components/Header';
+import TextEditor from '@/components/editor';
+import ProtectedComponent from '@/components/protected';
 
 const NewsletterCreateTheme: CustomFlowbiteTheme = {
 	floatingLabel: {

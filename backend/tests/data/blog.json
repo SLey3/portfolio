@@ -1,0 +1,8 @@
+{
+    "add": {
+        "title": "Test Blog",
+        "content": "[{'content': 'test content'}]",
+        "desc": "Sample Descriptions",
+        "is_draft": true
+    }
+}

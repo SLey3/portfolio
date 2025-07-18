@@ -1,7 +1,3 @@
-import { MediumCard } from '@/components/Cards';
-import WebFooter from '@/components/Footer';
-import NavBar from '@/components/NavBar';
-import Section from '@/components/section';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, TextInput } from 'flowbite-react';
 import React from 'react';
@@ -14,6 +10,11 @@ import { Link } from 'react-router-dom';
 import { Typewriter } from 'react-simple-typewriter';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { MediumCard } from '@/components/Cards';
+import WebFooter from '@/components/Footer';
+import NavBar from '@/components/NavBar';
+import Section from '@/components/section';
 
 const Home: React.FC = () => {
 	const typewriter_words: string[] = [

@@ -1,12 +1,3 @@
-import { MediumCard, SmallCard } from '@/components/Cards';
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import CertLicenseAddForm from '@/components/forms/CertLicenseAddForm';
-import CertLicenseEditForm from '@/components/forms/CertLicenseEditForm';
-import WorkExperienceAddForm from '@/components/forms/WorkExperienceAddForm';
-import WorkExperienceEditForm from '@/components/forms/WorkExperienceEditForm';
-import Section from '@/components/section';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Flowbite, Timeline } from 'flowbite-react';
@@ -44,6 +35,16 @@ import { VscVscode } from 'react-icons/vsc';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { MediumCard, SmallCard } from '@/components/Cards';
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import CertLicenseAddForm from '@/components/forms/CertLicenseAddForm';
+import CertLicenseEditForm from '@/components/forms/CertLicenseEditForm';
+import WorkExperienceAddForm from '@/components/forms/WorkExperienceAddForm';
+import WorkExperienceEditForm from '@/components/forms/WorkExperienceEditForm';
+import Section from '@/components/section';
 
 const TimelineTheme: CustomFlowbiteTheme = {
 	timeline: {

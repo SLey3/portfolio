@@ -13,7 +13,12 @@
 	"singleQuote": true,
 	"bracketSameLine": true,
 	"endOfLine": "auto",
-	"importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+	"importOrder": [
+		"@/pages/(.*)$",
+		"^@/components/(.*)$",
+		"^@/util/(.*)$",
+		"^[./]"
+	],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true
 }

@@ -1,5 +1,3 @@
-import WebFooter from '@/components/Footer';
-import NavBar from '@/components/NavBar';
 import { SetFormErrors } from '@/utils';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, Label, TextInput } from 'flowbite-react';
@@ -11,6 +9,9 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import WebFooter from '@/components/Footer';
+import NavBar from '@/components/NavBar';
 
 const Login: React.FC = () => {
 	const [cookies, setCookie] = useCookies(['user']);

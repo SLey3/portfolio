@@ -1,8 +1,3 @@
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import TextEditor from '@/components/editor';
-import ProtectedComponent from '@/components/protected';
 import { SetFormErrors, serializeEditorContent } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import { useTextEditor } from '@/utils/plate/editor';
@@ -18,6 +13,12 @@ import {
 } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import TextEditor from '@/components/editor';
+import ProtectedComponent from '@/components/protected';
 
 const EditBlog: React.FC = () => {
 	const [isProcessing, setIsProcessing] = useState(false);

@@ -1,12 +1,13 @@
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button, HR } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { CiSquarePlus } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
+
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
 
 const BlogPosts: React.FC = () => {
 	const [content, setContent] = useState<BlogList[] | null>(null);

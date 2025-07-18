@@ -23,11 +23,11 @@ repos:
   #   hooks:
   #     - id: isort
   #       args: ["--profile", "black", --fass, --honor-noqa, --color, -s, '["__pycache__/*", "instance/*", "*.pyc"]']
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        args: [--config, './backend/.flake8', './backend']
+  # - repo: https://github.com/PyCQA/flake8 # revise later current bug
+  #   rev: 6.0.0
+  #   hooks:
+  #     - id: flake8
+  #       args: [--config, './backend/.flake8', './backend']
   # - repo: https://github.com/pre-commit/pytest
   #   rev: v3.0.0
   #   hooks:

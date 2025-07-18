@@ -1,26 +1,3 @@
-import { BlockquoteElement } from '@/components/plate-ui/blockquote-element';
-import { Prism } from '@/components/plate-ui/code-block-combobox';
-import { CodeBlockElement } from '@/components/plate-ui/code-block-element';
-import { CodeLeaf } from '@/components/plate-ui/code-leaf';
-import { CodeLineElement } from '@/components/plate-ui/code-line-element';
-import { CodeSyntaxLeaf } from '@/components/plate-ui/code-syntax-leaf';
-import { ColumnElement } from '@/components/plate-ui/column-element';
-import { ColumnGroupElement } from '@/components/plate-ui/column-group-element';
-import { HeadingElement } from '@/components/plate-ui/heading-element';
-import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
-import { HrElement } from '@/components/plate-ui/hr-element';
-import { ImageElement } from '@/components/plate-ui/image-element';
-import { KbdLeaf } from '@/components/plate-ui/kbd-leaf';
-import { LinkElement } from '@/components/plate-ui/link-element';
-import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
-import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
-import {
-	TableCellElement,
-	TableCellHeaderElement,
-} from '@/components/plate-ui/table-cell-element';
-import { TableElement } from '@/components/plate-ui/table-element';
-import { TableRowElement } from '@/components/plate-ui/table-row-element';
-import { TodoListElement } from '@/components/plate-ui/todo-list-element';
 import { withProps } from '@udecode/cn';
 import {
 	BoldPlugin,
@@ -59,6 +36,30 @@ import {
 	TablePlugin,
 	TableRowPlugin,
 } from '@udecode/plate-table/react';
+
+import { BlockquoteElement } from '@/components/plate-ui/blockquote-element';
+import { Prism } from '@/components/plate-ui/code-block-combobox';
+import { CodeBlockElement } from '@/components/plate-ui/code-block-element';
+import { CodeLeaf } from '@/components/plate-ui/code-leaf';
+import { CodeLineElement } from '@/components/plate-ui/code-line-element';
+import { CodeSyntaxLeaf } from '@/components/plate-ui/code-syntax-leaf';
+import { ColumnElement } from '@/components/plate-ui/column-element';
+import { ColumnGroupElement } from '@/components/plate-ui/column-group-element';
+import { HeadingElement } from '@/components/plate-ui/heading-element';
+import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
+import { HrElement } from '@/components/plate-ui/hr-element';
+import { ImageElement } from '@/components/plate-ui/image-element';
+import { KbdLeaf } from '@/components/plate-ui/kbd-leaf';
+import { LinkElement } from '@/components/plate-ui/link-element';
+import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
+import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
+import {
+	TableCellElement,
+	TableCellHeaderElement,
+} from '@/components/plate-ui/table-cell-element';
+import { TableElement } from '@/components/plate-ui/table-element';
+import { TableRowElement } from '@/components/plate-ui/table-row-element';
+import { TodoListElement } from '@/components/plate-ui/todo-list-element';
 
 /**
  * Custom hook to create a temporary Plate editor instance with a set of predefined plugins and component overrides.

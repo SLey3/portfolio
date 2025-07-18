@@ -1,12 +1,3 @@
-import { LargeCard, MediumCard } from '@/components/Cards';
-import WebFooter from '@/components/Footer';
-import Header from '@/components/Header';
-import NavBar from '@/components/NavBar';
-import CourseAddForm from '@/components/forms/CourseAddForm';
-import CourseEditForm from '@/components/forms/CourseEditForm';
-import EducationAddForm from '@/components/forms/EducationAddForm';
-import EducationEditForm from '@/components/forms/EducationEditForm';
-import Section from '@/components/section';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button } from 'flowbite-react';
@@ -18,6 +9,16 @@ import { FaPencil } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { LargeCard, MediumCard } from '@/components/Cards';
+import WebFooter from '@/components/Footer';
+import Header from '@/components/Header';
+import NavBar from '@/components/NavBar';
+import CourseAddForm from '@/components/forms/CourseAddForm';
+import CourseEditForm from '@/components/forms/CourseEditForm';
+import EducationAddForm from '@/components/forms/EducationAddForm';
+import EducationEditForm from '@/components/forms/EducationEditForm';
+import Section from '@/components/section';
 
 const Education: React.FC = () => {
 	const [institutes, setInstitutes] = useState<InstituteProps[]>([]);

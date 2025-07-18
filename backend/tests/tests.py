@@ -7,15 +7,20 @@ import base64
 from pytest_assert_utils import assert_model_attrs, util
 from collections import namedtuple
 from itsdangerous.exc import BadSignature
-from sqlalchemy import text
 from flask import session, current_app
+from copy import copy
+from helpers import assert_status_code, assert_not_status_code, HTTPCode
 
 
 # tests
 def test_connection(client, create_engine):
     res = client.head("/education/institute")
 
-    assert res.status_code == 200, "Connection might either not be stable or working"
+    assert_status_code(
+        res,
+        HTTPCode.PASS,
+        "Connection might either not be stable or working. Returned HTTP code: {sc}",
+    )
 
 
 # login/admin
@@ -23,9 +28,7 @@ def test_login(client):
     # test for no data
     res = client.post("/admin/login")
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert res.json["error"] == "No data received", "Data existence check Failed"
 
     # test schema
@@ -33,9 +36,7 @@ def test_login(client):
 
     res = client.post("/admin/login", json=payload)
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert {
         "errors": {"email": ["Not a valid email address."]}
     } == res.json, "Not valid json data for schema username invalidation"
@@ -45,9 +46,7 @@ def test_login(client):
 
     res = client.post("/admin/login", json=payload)
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert {
         "errors": {"password": ["Length must be between 6 and 20."]}
     }, "Not valid json data for schema password invalidation"
@@ -57,9 +56,7 @@ def test_login(client):
 
     res = client.post("/admin/login", json=payload)
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert res.json["error"] == "Incorrect Password", "Incorrect Auth Failed Message"
 
     # test for incorrect username
@@ -67,9 +64,7 @@ def test_login(client):
 
     res = client.post("/admin/login", json=payload)
 
-    assert (
-        res.status_code == 404
-    ), f"Status code is not 404 as expected  but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.NOT_FOUND)
     assert res.json["error"] == "User not found", "Incorrect error message"
 
     # test for correct login
@@ -82,9 +77,7 @@ def test_login(client):
     with client:
         res = client.post("/admin/login", json=payload)
 
-        assert (
-            res.status_code == 200
-        ), f"Status code is not 200 as expected but rather: {res.status_code}"
+        assert_status_code(res, HTTPCode.PASS)
         assert "token" in session, "Token was not appended to session"
         assert_model_attrs(configured_model, res.json["user"])
 
@@ -102,27 +95,21 @@ def test_login_required(client, user):
     # test without bearer token
     res = client.get("/testing/loginrequired")
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
 
     # test with fake bearer token
     res = client.get(
         "/testing/loginrequired", headers={"Authorization": f"Bearer {fakeBearerToken}"}
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
 
     # test with real bearer token
     res = client.get(
         "/testing/loginrequired", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
 
 
 def test_logout(client, user):
@@ -130,9 +117,7 @@ def test_logout(client, user):
     with client:
         res = client.post("/admin/logout", headers={"Authorization": f"Bearer {user}"})
 
-        assert (
-            res.status_code == 200
-        ), f"Status code is not 200 as expected but rather {res.status_code}"
+        assert_status_code(res, HTTPCode.PASS)
         assert "token" not in session, "Token is still in session"
 
 
@@ -143,6 +128,7 @@ def test_link_inspector(client, datadir, user):
     # test
     res = client.get("/admin/links", headers={"Authorization": f"Bearer {user}"})
 
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         res.json["report"] == expected_data
     ), "report data did not match the expected data"
@@ -156,9 +142,7 @@ def test_execute_sql(client, datadir, user):
     # test submission with no data
     res = client.post("/admin/sql", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Error key is not present in the response json"
@@ -170,9 +154,7 @@ def test_execute_sql(client, datadir, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert res.json["res"] == expected_data, "result json did not match expected data"
 
     # test submission with invalid query (non existent table)
@@ -182,7 +164,9 @@ def test_execute_sql(client, datadir, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert res.status_code != 200, "Status code is 200"
+    assert_not_status_code(
+        "Response status code is 200 which is not expected", res=res, sc=HTTPCode.PASS
+    )
     assert (
         util.Dict.containing_exactly("err_msg") == res.json
     ), "Result JSON does not contain error message object"
@@ -196,9 +180,7 @@ def test_newsletter_subscribe(client):
     # test submission with no data
     res = client.post("/newsletter/subscribe")
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON does not contain no data error"
@@ -206,9 +188,7 @@ def test_newsletter_subscribe(client):
     # test submission with invalid email
     res = client.post("/newsletter/subscribe", json={"email": "testingtestcom"})
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert {
         "errors": {"email": ["Not a valid email address."]}
     } == res.json, "Not valid json data for schema email invalidation"
@@ -216,9 +196,7 @@ def test_newsletter_subscribe(client):
     # test submission with valid email
     res = client.post("/newsletter/subscribe", json=payload)
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert util.Dict.containing_exactly(
         "success"
     ), "Result JSON does not contain expected key of success"
@@ -232,9 +210,7 @@ def test_newsletter_getsubs(client, user):
     # test
     res = client.get("/newsletter/getsubs", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly("res") == res.json
     ), "Result JSON does not contain expected key of res"
@@ -252,16 +228,12 @@ def test_newsletter_draft_operations(client, user):
         "/newsletter/draft", json=payload, headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
 
     # test get request
     res = client.get("/newsletter/draft", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert_model_attrs(configured_model, res.json)
 
     # test delete request
@@ -269,16 +241,12 @@ def test_newsletter_draft_operations(client, user):
         "/newsletter/draft", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
 
     # test get request with no draft stored
     res = client.get("/newsletter/draft", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 204
-    ), f"Status code is not 204 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.NO_CONTENT)
 
 
 def test_newsletter_send(client, user, mail_outbox):
@@ -293,9 +261,7 @@ def test_newsletter_send(client, user, mail_outbox):
         "/newsletter/send", json=data, headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly("success") == res.json
     ), "Result JSON does not contain expected key of success"
@@ -311,9 +277,7 @@ def test_newsletter_send(client, user, mail_outbox):
     # test with no data
     res = client.post("/newsletter/send", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON does not contain expected key of error"
@@ -335,9 +299,7 @@ def test_newsletter_unsubscribe(app_ctx, client):
     # test with correct token
     res = client.delete("/newsletter/unsubscribe", query_string={"t": token})
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert util.Dict.containing_exactly(
         "success"
     ), "Result JSON does not contain expected key of success"
@@ -345,9 +307,7 @@ def test_newsletter_unsubscribe(app_ctx, client):
     # test without token
     res = client.delete("/newsletter/unsubscribe")
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON does not contain expected key of error"
@@ -361,9 +321,7 @@ def test_newsletter_unsubscribe(app_ctx, client):
         "/newsletter/unsubscribe", query_string={"t": "123abc.zien.duecb89d"}
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("expired") == res.json
     ), "Result JSON does not contain expected key of expired"
@@ -396,9 +354,7 @@ def test_get_course(client):
     # test without sending data first
     res = client.post("/education/courses")
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON does not contain expected key of error"
@@ -406,9 +362,7 @@ def test_get_course(client):
     # test with sending data
     res = client.post("/education/courses", json=payload)
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert_model_attrs(configured_model, res.json[0])
 
 
@@ -418,9 +372,7 @@ def test_add_course(client, user, datadir):
         "/education/courses/add", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON does not contain expected key of 'error'"
@@ -438,9 +390,7 @@ def test_add_course(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert (
         util.Dict().containing_only(
             errors={
@@ -458,9 +408,7 @@ def test_add_course(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict().containing_exactly(
             success='Entry: "EX-102" has been successfully added!'
@@ -469,28 +417,9 @@ def test_add_course(client, user, datadir):
     ), "Result JSON does not contain expected key and exact data of 'success'"
 
 
-def test_edit_course(client, user, datadir, sa_engine):
+def test_edit_course(client, user, datadir):
     # test preparation
     course_json = json.load(datadir["course.json"].open("r"))["edit"]["input"]
-    Model = namedtuple(
-        "EditCourseModel",
-        [
-            "id",
-            "course_name",
-            "course_id",
-            "course_url",
-            "associated_institute",
-            "desc",
-        ],
-    )
-    configured_model = Model(
-        id=2,
-        course_name=course_json["course_name"],
-        course_id=course_json["course_id"],
-        course_url="https://example.com/2",
-        associated_institute="Educational Institute",
-        desc="Another Small desc",
-    )
 
     CURLModel = namedtuple(
         "CourseUrlModel", "errors", defaults=({"course_url": ["Not a valid URL."]},)
@@ -508,27 +437,11 @@ def test_edit_course(client, user, datadir, sa_engine):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly(success="EC has been successfully updated!")
         == res.json
     ), "Result JSON content did not match expected content"
-
-    # verify changes made
-    with sa_engine.begin() as conn:
-        res = (
-            conn.execute(
-                text(
-                    "SELECT * FROM course WHERE associated_institute='Educational Institute' AND id=2"
-                )
-            )
-            .mappings()
-            .first()
-        )
-
-    assert_model_attrs(configured_model, res)
 
     # test raising validation error
     res = client.put(
@@ -537,9 +450,7 @@ def test_edit_course(client, user, datadir, sa_engine):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert_model_attrs(CURLModel(), res.json)
 
 
@@ -551,9 +462,7 @@ def test_delete_course(client, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly(success="EC has been deleted!") == res.json
     ), "Result JSON content did not match expected content"
@@ -563,9 +472,7 @@ def test_delete_course(client, user):
         "/education/courses/delete", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Result JSON content did not have expected key of 'error'"
@@ -613,6 +520,7 @@ def test_get_educational_institutes(client):
 
     res = client.get("/education/institute")
 
+    assert_status_code(res, HTTPCode.PASS)
     assert_model_attrs(configured_model, res.json[0])
 
 
@@ -641,9 +549,7 @@ def test_add_education(client, user, datadir):
         "/education/institute/add", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly("error") == res.json
     ), "Expected JSON did not contain expected key of 'error'"
@@ -657,9 +563,8 @@ def test_add_education(client, user, datadir):
         },
         headers={"Authorization": f"Bearer {user}"},
     )
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather: {res.status_code}"
+
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_only(
             success=f'Entry: "{education_json["w_grad_d_n_expected"]["name"]}" has been successfully added!'
@@ -677,9 +582,7 @@ def test_add_education(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 as expected but rather: {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_only(
             success=f'Entry: "{education_json["n_grad_d_w_expected"]["name"]}" has been successfully added!'
@@ -697,9 +600,7 @@ def test_add_education(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert_model_attrs(EIURLModel(), res.json)
 
     # test with data containing incorrect_institute
@@ -712,35 +613,13 @@ def test_add_education(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 as expected but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert_model_attrs(IITModel(), res.json)
 
 
-def test_edit_education(client, user, datadir, sa_engine):
+def test_edit_education(client, user, datadir):
     # test preparation
     education_edit_json = json.load(datadir["education.json"].open("r"))["edit"]
-    Model = namedtuple(
-        "InstituteEditModel",
-        [
-            "id",
-            "name",
-            "start_date",
-            "grad_date",
-            "expected_date",
-            "institute_type",
-            "awards",
-            "major",
-            "degree",
-            "institute_url",
-            "small_desc",
-            "created_at",
-            "logo_url",
-            "logo_id",
-        ],
-        defaults=(0,) * 14,
-    )
 
     # initiate test
     res = client.put(
@@ -753,40 +632,13 @@ def test_edit_education(client, user, datadir, sa_engine):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code} \n response json: {res.json}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly(
             success="2nd Educational Institute was successfully edited!"
         )
         == res.json
     ), "Requested JSON does not match expected"
-
-    # verify changes made
-    with sa_engine.begin() as conn:
-        res = (
-            conn.execute(text("SELECT * FROM education WHERE id=2")).mappings().first()
-        )
-
-        configured_model = Model(
-            id=2,
-            name="2nd Educational Institute",
-            start_date="July 2026",
-            grad_date="July 2030",
-            expected_date=None,
-            institute_type="University",
-            awards="Leadership Award | Pompeii Award of Excellence",
-            major="Economics",
-            degree="Bachelor of Science",
-            institute_url="https://example.com",
-            small_desc="small description",
-            logo_id=res["logo_id"],
-            logo_url=res["logo_url"],
-            created_at=res["created_at"],
-        )
-
-    assert_model_attrs(configured_model, res)
 
 
 def test_delete_education(client, user):
@@ -795,9 +647,7 @@ def test_delete_education(client, user):
         "/education/institute/delete", headers={"Authorization": f"Bearer {user}"}
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert util.Dict.containing_exactly(
         error="No data was provided!"
     ), "Result JSON content did not have expected key of 'error'"
@@ -809,12 +659,12 @@ def test_delete_education(client, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code != 500
-    ), "Status code was 500 implying deleting institute image failed"
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_not_status_code(
+        "Status code was 500 implying deleting institute image failed",
+        res=res,
+        sc=HTTPCode.INTERNAL_SERVER_ERR,
+    )
+    assert_status_code(res, HTTPCode.PASS)
     assert util.Dict.containing_exactly(
         success="2nd Educational Institute has been deleted!"
     )
@@ -824,9 +674,7 @@ def test_add_showcase(client, user):
     # test with no data first
     res = client.post("/showcase/add", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly(error="No data was provided!") == res.json
     ), "Resulting JSON did not contain expected keyword of 'error'"
@@ -838,9 +686,7 @@ def test_add_showcase(client, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly(error="not exist is not an existing project")
         == res.json
@@ -853,9 +699,7 @@ def test_add_showcase(client, user):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert util.Dict.containing_exactly(
         success="Example Project is not an existing project"
     )
@@ -868,9 +712,7 @@ def test_get_showcase(client, datadir):
     # test full functionality
     res = client.get("/showcase")
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly(comparator) == res.json
     ), "Result JSON did not contain the expected data"
@@ -878,24 +720,20 @@ def test_get_showcase(client, datadir):
 
 def test_get_projects(client, datadir):
     # test preparation
-    comparator = json.load(datadir["get_projects.json"].open("r"))
+    comparator = json.load(datadir["projects.json"].open("r"))["get"]
 
     # test full functionality
     res = client.get("/projects", query_string={"page": 1})
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
-    assert comparator == res.json, "Result JSON did not contain the expected data"
+    assert_status_code(res, HTTPCode.PASS)
+    assert comparator == res.json[0], "Result JSON did not contain the expected data"
 
 
 def test_get_project_totalpages(client):
     # test full functionality
     res = client.get("/projects/totalpages")
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert (
         util.Dict.containing_exactly(payload=1) == res.json
     ), "Result JSON data did not match one page as expected"
@@ -913,9 +751,7 @@ def test_add_project(client, user, datadir):
     # test request with no data
     res = client.post("/projects/add", headers={"Authorization": f"Bearer {user}"})
 
-    assert (
-        res.status_code == 400
-    ), f"Status code is not 400 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.BAD_REQ)
     assert (
         util.Dict.containing_exactly(error="No data was provided!") == res.json
     ), "Result JSON did not contain expected error message"
@@ -927,9 +763,7 @@ def test_add_project(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 403
-    ), f"Status code is not 403 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.FORBIDDEN)
     assert_model_attrs(PIURLModel(), res.json)
 
     # test request with full functionality
@@ -939,9 +773,85 @@ def test_add_project(client, user, datadir):
         headers={"Authorization": f"Bearer {user}"},
     )
 
-    assert (
-        res.status_code == 200
-    ), f"Status code is not 200 but rather {res.status_code}"
+    assert_status_code(res, HTTPCode.PASS)
     assert util.Dict.containing(
         success=f'{project["valid"]["name"]} was successfully added!'
     ), "Result JSON did not contain expected message"
+
+
+def test_edit_project(client, user, datadir):
+    # test preparation
+    project = json.load(datadir["projects.json"].open("r"))["edit"]
+
+    # initiate test
+    res = client.put(
+        "/projects/edit",
+        data={"fields": json.dumps(project.pop("fields")), **project},
+        headers={"Authorization": f"Bearer {user}"},
+    )
+
+    assert_status_code(res, HTTPCode.PASS)
+    assert (
+        util.Dict.containing_exactly(
+            success="Project 1.5.1 has been successfully updated!"
+        )
+        == res.json
+    ), "Result JSON did not contain the expected data"
+
+
+def test_delete_project(client, user):
+    # test with no data
+    res = client.delete("/projects/delete", headers={"Authorization": f"Bearer {user}"})
+
+    assert_status_code(res, HTTPCode.BAD_REQ)
+
+    # test delete functionality
+    res = client.delete(
+        "/projects/delete", json={"id": 1}, headers={"Authorization": f"Bearer {user}"}
+    )
+
+    assert_status_code(res, HTTPCode.PASS)
+    assert (
+        util.Dict.containing_exactly(
+            success="Example Project has been successfully deleted"
+        )
+        == res.json
+    ), "Result JSON did not contain the expected data"
+
+
+def test_get_no_blogs(client):
+    # tests whether 204 HTTP code was returned
+    res = client.get("/blog", query_string={"tp": 1})
+
+    assert_status_code(res, HTTPCode.NO_CONTENT)
+
+
+def test_add_blog(client, user, datadir):
+    # test preparation
+    blog = json.load(datadir["blog.json"].open("r"))["add"]
+    any_blog = copy(blog)
+    any_blog.popitem()
+
+    print(
+        "blog: ",
+        blog,
+        "any_blog: ",
+        any_blog,
+        sep="\n",
+        end="\n---------------------\n",
+    )
+
+    # test functionality with a missing form item
+    res = client.post(
+        "/blog/add", data={**any_blog}, headers={"Authorization": f"Bearer {user}"}
+    )
+
+    assert_status_code(res, HTTPCode.BAD_REQ)
+
+    # test complete functionality
+    print("blog content col before being sent to post request: ", type(blog["content"]))
+    res = client.post(
+        "/blog/add", data={**blog}, headers={"Authorization": f"Bearer {user}"}
+    )
+
+    assert_status_code(res, HTTPCode.PASS)

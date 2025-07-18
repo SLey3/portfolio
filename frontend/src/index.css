@@ -105,6 +105,9 @@
 
 	@font-face {
 		font-family: 'Cormorant Garamond', serif;
+		font-optical-sizing: auto;
+		font-weight: normal;
+		font-style: normal;
 		src: url('assets/fonts/cormorant-garmound/CormorantGaramond-Regular.ttf')
 			format('ttf');
 	}

@@ -1,6 +1,3 @@
-import WebFooter from '@/components/Footer';
-import NavBar from '@/components/NavBar';
-import BlogViewer from '@/components/render-blog';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -9,6 +6,10 @@ import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 import { Link, redirect, useNavigate, useSearchParams } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import WebFooter from '@/components/Footer';
+import NavBar from '@/components/NavBar';
+import BlogViewer from '@/components/render-blog';
 
 const ViewBlog: React.FC = () => {
 	const [blog, setBlog] = useState<BlogList | null>(null);

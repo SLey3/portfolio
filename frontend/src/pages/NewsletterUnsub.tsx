@@ -1,9 +1,10 @@
-import Header from '@/components/Header';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import Header from '@/components/Header';
 
 const NewsLetterUnsub: React.FC = () => {
 	const [response, setResponse] = useState(

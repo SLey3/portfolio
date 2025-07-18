@@ -1,7 +1,8 @@
-import WebFooter from '@/components/Footer';
-import NavBar from '@/components/NavBar';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+
+import WebFooter from '@/components/Footer';
+import NavBar from '@/components/NavBar';
 
 const Http404: React.FC = () => {
 	const location = useLocation();
