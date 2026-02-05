@@ -112,7 +112,6 @@ import { autoformatRules } from './autoformat';
  * Custom hook to initialize and configure a text editor with various plugins and functionalities.
  *
  * @param {string} BearerToken - The authorization token for API requests.
- * @param {boolean} [newsletter=false] - Flag to indicate if the editor is for a newsletter draft.
  * @param {boolean} [blog=false] - Flag to indicate if the editor is for a blog post.
  * @param {string | undefined} [blogID=undefined] - The ID of the blog post to edit.
  * @param {boolean} [modal=false] - Flag to indicate if the editor is used within a modal.

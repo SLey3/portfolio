@@ -2,11 +2,11 @@ import { getAdminLinkHighlightColor } from '@/utils';
 import useAuthToken from '@/utils/hooks/use-auth-token';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Button } from 'flowbite-react';
-import React, { type Key, useEffect, useState } from 'react';
+import React, { type Key, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { CiSquarePlus } from 'react-icons/ci';
 import { FaPencil, FaTrash } from 'react-icons/fa6';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, Zoom, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -23,7 +23,6 @@ const AdminDashboard: React.FC = () => {
 	const [sqlResults, setSqlResults] = useState<ExecuteQueryResProps[] | null>(
 		null
 	);
-	const [newsletterSubs, setNewsletterSubs] = useState<string[]>([]);
 	const [blogDrafts, setBlogDrafts] = useState<DraftBlogList[] | null>(null);
 	const [sqlErr, setSqlErr] = useState<null | string>(null);
 	const [linkIsProcessing, setLinkIsProcessing] = useState(false);
@@ -35,21 +34,6 @@ const AdminDashboard: React.FC = () => {
 	});
 	const navigate = useNavigate();
 	const BearerToken = useAuthToken();
-
-	useEffect(() => {
-		axios
-			.get('/api/newsletter/getsubs', {
-				headers: {
-					Authorization: `Bearer ${BearerToken}`,
-				},
-			})
-			.then((res: AxiosResponse) => {
-				setNewsletterSubs(res.data.res);
-			})
-			.catch((err: AxiosError) => {
-				console.error(err.response?.data);
-			});
-	}, [BearerToken]);
 
 	const onSQLQuerySubmit: SubmitHandler<ExecuteQueryForm> = (data) => {
 		axios
@@ -356,78 +340,6 @@ const AdminDashboard: React.FC = () => {
 											</div>
 										</>
 									) : null}
-								</div>
-							</div>
-						</div>
-						<div className="grid grid-rows-3 items-center justify-items-center pt-40">
-							<div>
-								<div className="flex flex-col items-center gap-y-4">
-									<div>
-										<div className="h-3 w-[calc(40rem/4)] rounded-md bg-white"></div>
-									</div>
-									<div>
-										<div className="h-3 w-[calc(40rem/2)] rounded-md bg-white"></div>
-									</div>
-									<div>
-										<div className="h-3 w-[40rem] rounded-md bg-white"></div>
-									</div>
-									<div>
-										<h1 className="p-3 font-ibm-plex-serif text-2xl tracking-widest text-white md:text-4xl lg:text-4xl xl:text-8xl">
-											Newsletter Manager
-										</h1>
-									</div>
-									<div>
-										<div className="h-3 w-[40rem] rounded-md bg-white"></div>
-									</div>
-									<div>
-										<div className="h-3 w-[calc(40rem/2)] rounded-md bg-white"></div>
-									</div>
-									<div>
-										<div className="h-3 w-[calc(40rem/4)] rounded-md bg-white"></div>
-									</div>
-								</div>
-							</div>
-							<div>
-								<div className="bg-gradient-slate h-auto w-96 rounded-lg">
-									<div className="flex flex-col items-center gap-y-4 py-10">
-										<div>
-											<h2 className="text-center font-ibm-plex-serif text-3xl font-semibold text-slate-200">
-												Create Newsletter
-											</h2>
-										</div>
-										<div>
-											<Button
-												as={Link}
-												gradientMonochrome="cyan"
-												pill
-												size="lg"
-												to="/admin/newsletter/create">
-												Create
-											</Button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div>
-								<div className="bg-gradient-slate h-auto w-[50rem] rounded-lg">
-									<div className="flex flex-col items-center gap-y-4 py-10">
-										<div>
-											<h2 className="text-center font-ibm-plex-serif text-3xl font-semibold text-slate-200">
-												Current Subscribers
-											</h2>
-										</div>
-										<div>
-											<div className="flex flex-col items-center gap-y-2 divide-y divide-slate-300">
-												{newsletterSubs.map((sub) => (
-													<div
-														className="pt-2 font-barlow text-lg text-slate-100 first:pt-0"
-														key={sub}>
-														{sub}
-													</div>
-												))}
-											</div>
-										</div>
-									</div>
 								</div>
 							</div>
 						</div>

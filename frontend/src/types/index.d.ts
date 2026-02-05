@@ -88,9 +88,6 @@ declare global {
 		extends Omit<Omit<Omit<BlogList, 'is_draft'>, 'content'>, 'author'> {}
 
 	// forms
-	interface NewsLetterCreateForm {
-		title: string;
-	}
 
 	interface LoginForm {
 		email: string;
@@ -182,11 +179,6 @@ declare global {
 		center?: boolean;
 	}
 
-	// footer
-	interface NewsLetterInput {
-		email: string;
-	}
-
 	// header
 	interface HeadersProps {
 		title: string;
@@ -202,11 +194,6 @@ declare global {
 		center?: boolean;
 		with_hr?: boolean;
 		children: React.ReactNode;
-	}
-
-	// main page
-	interface MainNewsLetterInput {
-		email: string;
 	}
 
 	// editor
@@ -244,9 +231,5 @@ declare global {
 	// axios error types
 	interface BaseReqError {
 		error?: string;
-	}
-
-	interface NewsLetterUnSubReqError extends BaseReqError {
-		expired?: string;
 	}
 }

@@ -1,14 +1,10 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Button, TextInput } from 'flowbite-react';
 import React from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import { BiCarousel } from 'react-icons/bi';
 import { FaPersonCircleExclamation } from 'react-icons/fa6';
-import { HiOutlineArrowRight } from 'react-icons/hi';
 import { RiGraduationCapFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { Typewriter } from 'react-simple-typewriter';
-import { ToastContainer, Zoom, toast } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { MediumCard } from '@/components/Cards';
@@ -21,46 +17,27 @@ const Home: React.FC = () => {
 		'Software Engineering',
 		'Frontend',
 		'Backend',
-		'SQL',
+		'PostgresSQL',
 		'React.js',
-		'Typescript / Javascript',
-		'Python',
+		'Next.js',
 		'Flask',
-		'Full Stack Web Development',
+		'Typescript / Javascript',
+		'Python'
 	];
-
-	const { register, handleSubmit } = useForm<MainNewsLetterInput>();
-
-	const onSubmit: SubmitHandler<MainNewsLetterInput> = (data) => {
-		axios
-			.post('/api/newsletter/subscribe', data, {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			.then((res: AxiosResponse) => {
-				toast.success(res.data?.success);
-			})
-			.catch((err: AxiosError) => {
-				const res = err.response?.data as {
-					errors: { [key: string]: string[] };
-				};
-
-				toast.error(res?.errors[0]);
-			});
-	};
 
 	return (
 		<>
 			<NavBar />
-			<div className="float-right mt-5 space-y-5 p-3 md:w-60 md:-translate-x-36 lg:-translate-x-64">
-				<h1 className="text-balance font-poppins text-6xl text-white md:text-7xl lg:text-8xl">
+			<div className="mt-5 space-y-5 p-3">
+				<h1 className="text-balance pb-2 text-center font-poppins line-clamp-4 md:line-clamp-1 text-6xl text-white md:text-4xl lg:text-5xl xl:text-7xl">
 					Welcome! I&apos;m Sergio Ley Languren
 				</h1>
-				<div className="text-wrap font-poppins text-3xl text-white md:text-[33px] lg:text-4xl">
-					What I Do:
+				<div className="text-wrap lg:text-balance font-poppins text-3xl text-white md:text-[33px] lg:text-4xl">
+					<p className="lg:text-center">
+						What I Do:
+					</p>
 					<br />{' '}
-					<span className="font-extrabold text-slate-300">
+					<span className="relative md:left-[calc(43.5%)] font-extrabold text-slate-300">
 						<Typewriter
 							cursor={true}
 							cursorStyle={'_|'}
@@ -69,53 +46,6 @@ const Home: React.FC = () => {
 							words={typewriter_words}
 						/>
 					</span>
-				</div>
-			</div>
-			<div className="hidden w-full md:absolute md:right-44 md:top-1/4 md:clear-left md:block lg:right-32 xl:right-72">
-				<div className="flex flex-col items-center gap-y-3">
-					<div className="relative lg:right-16 lg:w-1/2 xl:left-80 xl:w-full">
-						<h2 className="font-poppins text-2xl font-bold tracking-normal text-white lg:text-5xl lg:tracking-wider">
-							Sign up for the Newsletter
-						</h2>
-					</div>
-					<div className="relative lg:right-44 xl:right-16">
-						<p className="w-72 font-cormorant-garamond text-base font-light leading-relaxed text-slate-200 lg:text-lg xl:w-[40rem]">
-							Stay updated on my professional activities,
-							including new projects, releases, internships, and
-							blog posts, by subscribing to my newsletter.
-							It&apos;s also a great way to provide feedback and
-							stay connected.
-						</p>
-					</div>
-					<div>
-						{/* prettier-ignore */}
-						<form
-							className="relative flex flex-col content-center justify-start w-full gap-6 md:right-10 lg:right-32 lg:translate-x-0 xl:right-36 xl:flex-row"
-							onSubmit={handleSubmit(onSubmit)}> { }
-							<div>
-								<TextInput
-									className="lg:w-96"
-									id="newsletter-register"
-									placeholder="johndoe@example.com"
-									sizing="lg"
-									type="text"
-									{...register('email', {
-										required: 'Field cannot be empty!',
-									})}
-								/>
-							</div>
-							<div>
-								<Button
-									gradientMonochrome="cyan"
-									pill
-									size="lg"
-									type="submit">
-									Sign Up
-									<HiOutlineArrowRight className="translate-x-1 h-11 md:h-5" />
-								</Button>
-							</div>
-						</form>
-					</div>
 				</div>
 			</div>
 			<div className="mb-16 mt-3 flex w-screen translate-y-12 flex-col space-y-5">

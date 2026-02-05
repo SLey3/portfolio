@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 
 Sentry.init({
-	dsn: process.env.SENTRY_DSN,
+	dsn: import.meta.env.VITE_SENTRY_DSN,
 	beforeSend(event) {
 		// Check if it is an exception, and if so, show the report dialog
 		if (event.exception && event.event_id) {

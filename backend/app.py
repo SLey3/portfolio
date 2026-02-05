@@ -11,7 +11,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.pool import NullPool
 
 import config as cg
-from utils.newsletter import init_serializer_and_salt
 from utils.sql import showcase_has_data, SQLAlchemyBase
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -63,9 +62,6 @@ def create_app(test=False):
     from api import api
 
     app.register_blueprint(api)
-
-    # init newsletter salt
-    init_serializer_and_salt(app)
 
     # atexit registrations
     def run_db_drop_all():

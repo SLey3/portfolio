@@ -32,29 +32,6 @@ class Admin(db.Model):
     password: Mapped[str] = mapped_column(unique=True, nullable=False)
 
 
-class NewsLetterList(db.Model):
-    """
-    db model for the newsletter list
-
-    params:
-        :id: unique id that identifies a row
-        :email: email of subscriber
-    """
-
-    __tablename__ = "newsletter_list"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    email: Mapped[str] = mapped_column(unique=True, nullable=False)
-
-
-class NewsLetterDraftContent(db.Model):
-    __tablename__ = "newsletter_draft"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(nullable=False)
-    content: Mapped[dict] = mapped_column(JSONB(), unique=True, nullable=False)
-
-
 class BlogPost(db.Model):
     """
     db model for blog post entries
@@ -282,18 +259,6 @@ class AdminSchema(ma.SQLAlchemyAutoSchema):
 
     email = ma.auto_field(validate=[validate.Email()])
     password = ma.auto_field(validate=[validate.Length(6, 20)])
-
-
-class NewsLetterSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = NewsLetterList
-
-    email = ma.auto_field(validate=[validate.Email()])
-
-
-class NewsLetterDraftContentSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = NewsLetterDraftContent
 
 
 class BlogPostSchema(ma.SQLAlchemyAutoSchema):

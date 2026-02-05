@@ -1,29 +1,8 @@
-import axios from 'axios';
-import { Button, Footer, TextInput } from 'flowbite-react';
-import React, { useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Footer } from 'flowbite-react';
+import React from 'react';
 import { BsGithub, BsInstagram, BsLinkedin } from 'react-icons/bs';
-import { HiOutlineArrowRight } from 'react-icons/hi';
 
 const WebFooter: React.FC = () => {
-	const [subscriptionSuccess, setSubscriptionSuccess] = useState(false);
-	const { register, handleSubmit } = useForm<NewsLetterInput>();
-
-	const onSubmit: SubmitHandler<NewsLetterInput> = (data) => {
-		axios
-			.post('/api/newsletter/subscribe', data, {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			.then(() => {
-				setSubscriptionSuccess(true);
-			})
-			.catch(() => {
-				return;
-			});
-	};
-
 	return (
 		<>
 			<Footer bgDark container id="web-footer">
@@ -71,61 +50,6 @@ const WebFooter: React.FC = () => {
 									Administrator Login
 								</Footer.Link>
 							</Footer.LinkGroup>
-						</div>
-						<div className="col-span-1 md:col-span-4">
-							{}
-							<form onSubmit={handleSubmit(onSubmit)}>
-								<div className="flex flex-col items-center gap-y-4">
-									<div className="flex flex-row items-center justify-center gap-x-3">
-										<TextInput
-											className="w-32"
-											placeholder="johndoe@example.com"
-											shadow
-											sizing="sm"
-											type="text"
-											{...register('email', {
-												required:
-													'Field cannot be empty!',
-											})}
-											color={
-												subscriptionSuccess
-													? 'success'
-													: 'gray'
-											}
-											disabled={
-												subscriptionSuccess
-													? true
-													: false
-											}
-											helperText={
-												<>
-													<p className="font-cormorant-garamond">
-														{subscriptionSuccess
-															? 'Subscription activated! Thank you for subscribing to the newsletter'
-															: null}
-													</p>
-												</>
-											}
-										/>
-										<Button
-											className={`${subscriptionSuccess ? 'hidden' : 'block'} select-none`}
-											gradientMonochrome="cyan"
-											pill
-											type="submit">
-											Sign Up
-											<HiOutlineArrowRight className="h-11 translate-x-1 md:h-5" />
-										</Button>
-									</div>
-									<p className="mt-2 w-64 select-none text-center font-cormorant-garamond text-xs font-light leading-tight tracking-tight text-slate-400 antialiased">
-										Stay updated on my professional
-										activities, including new projects,
-										releases, internships, and blog posts,
-										by subscribing to my newsletter.
-										It&apos;s also a great way to provide
-										feedback and stay connected.
-									</p>
-								</div>
-							</form>
 						</div>
 					</div>
 					<div className="w-full bg-gray-700 px-4 py-6 sm:flex sm:items-center sm:justify-between">

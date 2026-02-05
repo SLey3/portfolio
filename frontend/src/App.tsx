@@ -11,8 +11,6 @@ import Education from '@/pages/Education';
 import Experience from '@/pages/Experience';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
-import NewsletterSend from '@/pages/NewsletterCreate';
-import NewsLetterUnsub from '@/pages/NewsletterUnsub';
 import Projects from '@/pages/Projects';
 import Showcase from '@/pages/Showcase';
 import ViewBlog from '@/pages/ViewBlogs';
@@ -44,14 +42,6 @@ export function App() {
 					<Route
 						Component={AdminDashboard}
 						path="/admin/management"
-					/>
-					<Route
-						Component={NewsletterSend}
-						path="/admin/newsletter/create"
-					/>
-					<Route
-						Component={NewsLetterUnsub}
-						path="/newsletter/unsubscribe"
 					/>
 					<Route Component={Http404} path="/*" />
 				</SentryRoutes>
