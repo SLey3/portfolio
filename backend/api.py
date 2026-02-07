@@ -132,9 +132,10 @@ def admin_link_inspector():
     Returns:
         Response: A JSON response containing the inspection results.
     """
-    res = inspect_links(db.engine)
+    links = inspect_links(db.engine)
+    report = links if len(links) != 0 else "No links found."
 
-    return jsonify({"report": res})
+    return jsonify({"report": report})
 
 
 @api.post("/admin/sql")

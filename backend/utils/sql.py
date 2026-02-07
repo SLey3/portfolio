@@ -69,11 +69,15 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
     results = []
 
     for table, table_name in _get_table_with_url_columns(engine):
+        if len(table) == 0:
+            continue
+
         for column in table:
             if column["name"].find("url") == -1:
                 continue
 
             with Session(engine) as session:
+
                 column_res = session.execute(
                     text(
                         f"SELECT id, {column['name']} FROM {table_name} WHERE {column['name']} IS NOT NULL"
@@ -84,7 +88,7 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                     url = row[1]
 
                     try:
-                        res = requests.head(url, timeout=30)
+                        res = requests.head(url, timeout=30, verify=False)
                     except requests.exceptions.Timeout:
                         results.append(
                             {
@@ -92,10 +96,24 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                                 "item_id": row[0],
                                 "link": url,
                                 "validity": False,
-                                "http_code": res.status_code,
+                                "http_code": 500,
                             }
                         )
                         continue
+                    except requests.exceptions.SSLError:
+                        # clear results first before adding in error
+                        results.clear()
+
+                        # append error message
+                        results.append(
+                            {
+                                "tablename": " ",
+                                "item_id": 1,
+                                "link": " ",
+                                "validity": "SSLError has occured. Please update CA on Render.",
+                                "http_code": 503,
+                            }
+                        )
 
                     if not res.ok and "Server" in res.headers:
                         if "AkamaiGHost" in res.headers["Server"]:
@@ -110,6 +128,8 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                             validity = (
                                 "Validity check failed due to CloudFlare blocking"
                             )
+                        else:
+                            validity = "Validity check failed due to unknown firewall"
                     else:
                         validity = str(res.status_code).startswith("2")
 

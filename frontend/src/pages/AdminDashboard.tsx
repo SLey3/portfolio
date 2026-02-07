@@ -17,7 +17,7 @@ import NavBar from '@/components/NavBar';
 import ProtectedComponent from '@/components/protected';
 
 const AdminDashboard: React.FC = () => {
-	const [linkResults, setLinkResults] = useState<null | LinkResultsProps[]>(
+	const [linkResults, setLinkResults] = useState<null | LinkResultsProps[] | string>(
 		null
 	);
 	const [sqlResults, setSqlResults] = useState<ExecuteQueryResProps[] | null>(
@@ -76,7 +76,7 @@ const AdminDashboard: React.FC = () => {
 					Authorization: `Bearer ${BearerToken}`,
 				},
 			})
-			.then((res: AxiosResponse) => {
+			.then((res: AxiosResponse<{report: LinkResultsProps[] | string}>) => {
 				setLinkResults(res.data.report);
 				setLinkIsProcessing(false);
 			})
@@ -181,36 +181,59 @@ const AdminDashboard: React.FC = () => {
 														</tr>
 													</thead>
 													<tbody className="font-barlow [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-b-slate-400">
-														{linkResults.map(
-															(entry) => (
-																<tr
-																	className={`${getAdminLinkHighlightColor(entry.http_code)} h-12 text-center`}
-																	key={
-																		entry.link
-																	}>
-																	<th scope="rowgroup">
-																		{
-																			entry.tablename
-																		}
-																	</th>
-																	<td>
-																		{
-																			entry.item_id
-																		}
-																	</td>
-																	<td className="truncate">
-																		{
+														{typeof linkResults !== 'string' ?
+															linkResults.map(
+																(entry) => (
+																	<tr
+																		className={`${getAdminLinkHighlightColor(entry.http_code)} h-12 text-center`}
+																		key={
 																			entry.link
-																		}
-																	</td>
-																	<td>{`${entry.validity}`}</td>
-																	<td>
-																		{
-																			entry.http_code
-																		}
-																	</td>
-																</tr>
+																		}>
+																		<th scope="rowgroup">
+																			{
+																				entry.tablename
+																			}
+																		</th>
+																		<td>
+																			{
+																				entry.item_id
+																			}
+																		</td>
+																		<td className="truncate">
+																			{
+																				entry.link
+																			}
+																		</td>
+																		<td>{`${entry.validity}`}</td>
+																		<td>
+																			{
+																				entry.http_code
+																			}
+																		</td>
+																	</tr>
+																)
 															)
+														: (
+															<tr
+																className={`${getAdminLinkHighlightColor(300)} h-12 text-center`}
+																key={"ndf"}
+															>
+																<th scope="rowgroup">
+																	{" "}
+																</th>
+																<td>
+																	{" "}
+																</td>
+																<td>
+																	{linkResults}
+																</td>
+																<td>
+																	{" "}
+																</td>
+																<td>
+																	{" "}
+																</td>
+															</tr>
 														)}
 													</tbody>
 												</table>
