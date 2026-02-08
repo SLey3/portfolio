@@ -102,9 +102,6 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                         )
                         continue
                     except requests.exceptions.SSLError as e:
-                        # clear results first before adding in error
-                        results.clear()
-
                         # append error message
                         results.append(
                             {
