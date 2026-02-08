@@ -6,6 +6,7 @@ from math import ceil
 from typing import Any, List
 
 import requests
+import certifi
 from sqlalchemy import func, inspect, select, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import DatabaseError
@@ -88,7 +89,7 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                     url = row[1]
 
                     try:
-                        res = requests.head(url, timeout=30, verify=False)
+                        res = requests.head(url, timeout=30, verify=certifi.where())
                     except requests.exceptions.Timeout:
                         results.append(
                             {

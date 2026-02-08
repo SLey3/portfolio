@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 from flask import current_app
 
 import requests
+import certifi
 from dotenv import load_dotenv
 from imagekitio import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
@@ -177,7 +178,9 @@ def upload_blog_images(data: list[dict[Any, str]]) -> list[dict[Any, str]] | int
             img_url = urlparse(row["url"])
 
             if all([img_url.scheme, img_url.netloc]):
-                res = requests.get(img_url.geturl(), stream=True)
+                res = requests.get(
+                    img_url.geturl(), stream=True, verify=certifi.where()
+                )
 
                 if res.status_code == 200:
                     image = FileStorage(BytesIO(res.content))
@@ -205,7 +208,9 @@ def patch_blog_images(data: list[dict[Any, str]]) -> list[dict[Any, str]]:
             img_url = urlparse(row["url"])
 
             if all([img_url.scheme, img_url.netloc]):
-                res = requests.get(img_url.geturl(), stream=True)
+                res = requests.get(
+                    img_url.geturl(), stream=True, verify=certifi.where()
+                )
 
                 if res.status_code == 200:
                     image = FileStorage(BytesIO(res.content))
