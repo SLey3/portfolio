@@ -101,38 +101,47 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                             }
                         )
                         continue
-                    except requests.exceptions.SSLError:
+                    except requests.exceptions.SSLError as e:
                         # clear results first before adding in error
                         results.clear()
 
                         # append error message
                         results.append(
                             {
-                                "tablename": " ",
-                                "item_id": 1,
-                                "link": " ",
-                                "validity": "SSLError has occured. Please update CA on Render.",
+                                "tablename": table_name,
+                                "item_id": row[0],
+                                "link": url,
+                                "validity": f"""SSLError has occurred. Please check CA version on Render else could be something different. 
+                                                \n Error traceback dump: \n\n
+                                                {str(e)}""",
                                 "http_code": 503,
                             }
                         )
 
-                    if not res.ok and "Server" in res.headers:
-                        if "AkamaiGHost" in res.headers["Server"]:
-                            validity = (
-                                "Validity check failed due to AkamaiGHost blocking"
-                            )
+                        break
 
-                        if (
-                            "CF-RAY" in res.headers
-                            and "cloudflare" in res.headers["Server"]
-                        ):
-                            validity = (
-                                "Validity check failed due to CloudFlare blocking"
-                            )
+                    if not res.ok:
+                        if "Server" in res.headers:
+                            if "AkamaiGHost" in res.headers["Server"]:
+                                validity = (
+                                    "Validity check failed due to AkamaiGHost blocking"
+                                )
+
+                            if (
+                                "CF-RAY" in res.headers
+                                and "cloudflare" in res.headers["Server"]
+                            ):
+                                validity = (
+                                    "Validity check failed due to CloudFlare blocking"
+                                )
+                            else:
+                                validity = (
+                                    "Validity check failed due to unknown firewall"
+                                )
                         else:
-                            validity = "Validity check failed due to unknown firewall"
+                            validity = res.status_code
                     else:
-                        validity = str(res.status_code).startswith("2")
+                        validity = True
 
                     results.append(
                         {
