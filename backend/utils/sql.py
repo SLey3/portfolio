@@ -115,8 +115,6 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                             }
                         )
 
-                        break
-
                     if not res.ok:
                         if "Server" in res.headers:
                             if "AkamaiGHost" in res.headers["Server"]:
@@ -136,9 +134,9 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                                     "Validity check failed due to unknown firewall"
                                 )
                         else:
-                            validity = res.status_code
+                            validity = False
                     else:
-                        validity = True
+                        validity = str(res.status_code).startswith("2")
 
                     results.append(
                         {
