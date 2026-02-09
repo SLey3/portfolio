@@ -5,6 +5,7 @@ This module contains utility functions related to SQL operations needed in setup
 from math import ceil
 from typing import Any, List
 
+import traceback
 import requests
 import certifi
 from sqlalchemy import func, inspect, select, text
@@ -110,7 +111,7 @@ def inspect_links(engine: Engine) -> List[dict[str, Any]]:
                                 "link": url,
                                 "validity": f"""SSLError has occurred. Please check CA version on Render else could be something different. 
                                                 \n Error traceback dump: \n\n
-                                                {str(e)}""",
+                                                {traceback.format_exc()}""",
                                 "http_code": 503,
                             }
                         )
